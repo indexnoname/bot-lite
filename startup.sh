@@ -1,7 +1,7 @@
 #!/bin/bash
 # create virtual environment if there is none
 if [ ! -d botvenv ]; then
-    python -m venv botvenv
+    python3 -m venv botvenv
 fi
 
 # Activate the virtual environment
