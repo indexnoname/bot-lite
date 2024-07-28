@@ -43,8 +43,8 @@ async def airun(ctx, model: str, prompt: str):
 
     # Run the model
     await ctx.send(f"Running model '{model}'...")
-    execute_shell_command(f'ollama run {model} {prompt}]')
-    await ctx.send(f"Model '{model}' is running.")
+    out = execute_shell_command(f'ollama run {model} {prompt}]')
+    await ctx.send(out)
 
 # Run the bot with your token
 bot.run(config['token'])
