@@ -30,7 +30,9 @@ def get_model_list():
 @bot.command(name='ailist')
 async def ailist(ctx):
     model_names = execute_shell_command('ollama list')
-    await ctx.send("Available models:\n```\n{}\n```".format('\n'.join(model_names)))
+    await ctx.send(f"Available models:\n```\n{output}\n```")
+
+
 
 # Command to run a specific model in Ollama
 @bot.command(name='airun')
