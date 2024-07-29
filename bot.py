@@ -51,6 +51,7 @@ async def airun(ctx, model: str, *, prompt: str):
 import numpy as np
 from collections import Counter
 from PIL import Image
+import math
 
 COLORS = {
     "copper": (217, 157, 115),
