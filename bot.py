@@ -48,5 +48,125 @@ async def airun(ctx, model: str, *, prompt: str):
     await ctx.send(f"Running model '{model}'...")
     await ctx.send(execute(f'ollama run {model} {prompt}]'))
 
+import numpy as np
+from collections import Counter
+from PIL import Image
+
+COLORS = {
+    "copper": (217, 157, 115),
+    "lead": (140, 127, 169),
+    "metaglass": (235, 238, 245),
+    "graphite": (178, 198, 210),
+    "sand": (247, 203, 164),
+    "coal": (39, 39, 39),
+    "titanium": (141, 161, 227),
+    "thorium": (249, 163, 199),
+    "scrap": (119, 119, 119),
+    "silicon": (83, 86, 92),
+    "plastanium": (203, 217, 127),
+    "phase-fabric": (244, 186, 110),
+    "surge-alloy": (243, 233, 121),
+    "spore-pod": (116, 87, 206),
+    "blast-compound": (255, 121, 94),
+    "pyratite": (255, 170, 95),
+    "beryllium": (58, 143, 100),
+    "fissile-matter": (94, 152, 142),
+    "dormant-cyst": (218, 132, 78),
+    "tungsten": (118, 138, 154),
+    "oxide": (228, 255, 214),
+    "carbide": (137, 118, 154),
+}
+
+MAX_WIDTH = 128
+MAX_HEIGHT = 128
+
+def map_to_nearest_color(pixel, colors):
+    nearest_color = min(colors, key=lambda color: sum((p - c) ** 2 for p, c in zip(pixel, colors[color])))
+    return colors[nearest_color]
+
+def majority_color_resize(image, scale):
+    original_width, original_height = image.size
+    scale = scale / 100
+    scaleW = MAX_WIDTH / original_width
+    scaleH = MAX_HEIGHT / original_height
+    scale = min(scale, scaleW, scaleH)
+    target_width = math.floor(original_width * scale)
+    target_height = math.floor(original_height * scale)
+
+    resized_image = Image.new('RGB', (target_width, target_height))
+    pixels = np.array(image)
+
+    for y in range(target_height):
+        for x in range(target_width):
+            block_pixels = pixels[
+                math.floor(y * original_height / target_height): math.ceil((y + 1) * original_height / target_height),
+                math.floor(x * original_width / target_width): math.ceil((x + 1) * original_width / target_width)
+            ]
+            flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
+            color_counts = Counter(map(tuple, flat_pixels))
+            majority_color = max(color_counts, key=color_counts.get)
+            resized_image.putpixel((x, y), majority_color)
+
+    return resized_image, target_width, target_height
+
+def resize_image(image, scale, resample_method='LANCZOS'):
+    if resample_method == 'NEAREST':
+        resample = Image.NEAREST
+    elif resample_method == 'MAJORITY':
+        return majority_color_resize(image, scale)
+    else:
+        resample = Image.LANCZOS
+
+    original_width, original_height = image.size
+    scale = scale / 100
+    scaleW = MAX_WIDTH / original_width
+    scaleH = MAX_HEIGHT / original_height
+    scale = min(scale, scaleW, scaleH)
+    target_width = math.floor(original_width * scale)
+    target_height = math.floor(original_height * scale)
+
+    return image.resize((target_width, target_height), resample), target_width, target_height
+
+def convert_image_to_22_colors(image):
+    pixels = np.array(image)
+    height, width, _ = pixels.shape
+
+    for y in range(height):
+        for x in range(width):
+            pixels[y, x] = map_to_nearest_color(tuple(pixels[y, x]), COLORS)
+
+    return Image.fromarray(pixels.astype('uint8'), 'RGB'), width, height
+
+@bot.command(name='convertimage', brief='Attach an image, specify a scale percentage, and choose a resample method, e.g., !convertimage 75 mix')
+async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
+    """
+    Converts an attached image to a Mindustry schematic.
+
+    Parameters:
+    scale (int): The scale to resize the image. Default is 100 (no resizing).
+    resample_method (str): The resampling method to use ('LANCZOS', 'NEAREST', 'MAJORITY'). Default is 'LANCZOS'.
+    """
+    if len(ctx.message.attachments) == 0:
+        await ctx.send('Please attach an image.')
+        return
+
+    image_file = ctx.message.attachments[0].filename
+    await ctx.message.attachments[0].save(image_file)
+
+    image = Image.open(image_file).convert('RGB')
+
+    if resample_method.lower() == 'mix':
+        resample_method = 'LANCZOS'
+    elif resample_method.lower() == 'majority':
+        resample_method = 'MAJORITY'
+    else:
+        resample_method = 'NEAREST'
+
+    resized_image, new_width, new_height = resize_image(image, scale, resample_method)
+    converted_image, new_width, new_height = convert_image_to_22_colors(resized_image)
+    output_file = image_to_scheme(converted_image, new_width, new_height)
+
+    await ctx.send(file=discord.File(output_file))
+
 # Run the bot with your token
 bot.run(config['token'])
