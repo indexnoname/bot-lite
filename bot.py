@@ -7,7 +7,6 @@ import os
 # Load configuration from JSON file
 with open('config.json', 'r') as config_file:
     config = json.load(config_file)
-CHANNEL_ID = int(config['channel_id'])
 
 # Initialize the bot with a command prefix
 intents = discord.Intents.default()
@@ -25,6 +24,16 @@ def get_model_list():
     lines = output.splitlines()
     model_names = [line.split()[0] for line in lines[1:]]  # Skip the header line and get the first word of each line
     return model_names
+
+@bot.event
+async def on_ready():
+    print(f'Bot is ready. Logged in as {bot.user}')
+
+@bot.event
+async def on_member_join(member):
+    channel = bot.get_channel(info['welcome_channel_id'])
+    if channel:
+        await channel.send(f'Hello {member.mention}! Welcome to the server!')
 
 # Command to list all AI models in Ollama
 @bot.command(name='ailist')
