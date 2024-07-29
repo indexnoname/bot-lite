@@ -159,7 +159,7 @@ def convert_image_to_scheme(image):
 
     for y in range(height):
         for x in range(width):
-            color = tuple(new_pixels[y, x])
+            color = (new_pixels[y, x])
             item = next((item for item, c in COLORS.items() if c == color), None)
             if item:
                 block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
