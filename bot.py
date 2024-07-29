@@ -83,8 +83,12 @@ MAX_WIDTH = 128
 MAX_HEIGHT = 128
 
 def map_to_nearest_color(pixel, colors):
-    nearest_color = min(colors, key=lambda color: sum((p - c) ** 2 for p, c in zip(pixel, colors[color])))
-    return colors[nearest_color]
+    color_array = np.array(list(colors.values()), dtype=np.float32)
+    pixel_array = np.array(pixel, dtype=np.float32)
+    distances = np.sum((color_array - pixel_array) ** 2, axis=1)
+    nearest_index = np.argmin(distances)
+    nearest_color = list(colors.values())[nearest_index]
+    return nearest_color
 
 def majority_color_resize(image, scale):
     original_width, original_height = image.size
@@ -135,7 +139,7 @@ def convert_image_to_22_colors(image):
 
     for y in range(height):
         for x in range(width):
-            pixels[y, x] = map_to_nearest_color(tuple(pixels[y, x]), COLORS)
+            pixels[y, x] = map_to_nearest_color(pixels[y, x], COLORS)
     
     return Image.fromarray(pixels.astype('uint8'), 'RGB'), width, height
 
@@ -189,7 +193,6 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     output_file = image_to_scheme(converted_image, new_width, new_height)
 
     await ctx.send(file=discord.File(output_file))
-
 
 # Run the bot with your token
 bot.run(config['token'])
