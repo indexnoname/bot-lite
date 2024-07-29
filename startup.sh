@@ -22,8 +22,8 @@ REQUIRED_PACKAGES=(
 
 # install missing packages
 for package in "${REQUIRED_PACKAGES[@]}"; do
-    if ! python -c "import ${package%%=*}" &> /dev/null; then
-        pip3 install "$package"
+    if ! pip list | grep -F "$package" &> /dev/null; then
+        pip install "$package"
     fi
 done
 
