@@ -189,3 +189,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     output_file = image_to_scheme(converted_image, new_width, new_height)
 
     await ctx.send(file=discord.File(output_file))
+
+
+# Run the bot with your token
+bot.run(config['token'])
