@@ -22,9 +22,10 @@ REQUIRED_PACKAGES=(
 )
 
 # install missing packages
-for package in "${!REQUIRED_PACKAGES[@]}"; do
-    if ! python -c "import ${REQUIRED_PACKAGES[$package]}" &> /dev/null; then
-        pip3 install "$package"
+for pkg in "${!REQUIRED_PACKAGES[@]}"; do
+    import=${REQUIRED_PACKAGES[$pkg]}
+    if ! python -c "import $import" &> /dev/null; then
+        pip install "$pkg"
     fi
 done
 
