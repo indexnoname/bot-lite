@@ -22,6 +22,9 @@ fi
 if ! python -c "from PIL import image" &> /dev/null; then
     pip3 install Pillow
 fi
+if ! python -c "import pymsch" &> /dev/null; then
+    pip3 install pymsch
+fi
 
 # run the bot script
 python3 bot.py
