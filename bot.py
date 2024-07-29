@@ -157,22 +157,15 @@ def convert_image_to_scheme(image):
     scheme = Schematic()
     scheme.bounds = (height, width)
 
-    # Prefill the scheme with blocks
-    blocks = np.full((height, width), Content.SORTER, dtype=object)
-    
     for y in range(height):
         for x in range(width):
             color = tuple(new_pixels[y, x])
             item = next((item for item, c in COLORS.items() if c == color), None)
             if item:
-                blocks[y, x] = item.upper().replace('-', '_')
+                block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
+                scheme.add_block(block)
+                block.set_config(Content[item.upper().replace('-', '_')])
 
-    # Add blocks and set configurations
-    for y in range(height):
-        for x in range(width):
-            block = scheme.add_block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
-            block.set_config(Content[blocks[y, x]])
-    
     scheme.name = "image"
     scheme.write_file("scheme.msch")
 
