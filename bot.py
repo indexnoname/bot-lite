@@ -52,7 +52,7 @@ import numpy as np
 from collections import Counter
 from PIL import Image
 import math
-import pymsch
+from pymsch import Schematic, Block, Content
 
 COLORS = {
     "copper":(217,157,115),
