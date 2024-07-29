@@ -72,8 +72,8 @@ COLORS = {
     "blast-compound": (255, 121, 94),
     "pyratite": (255, 170, 95),
     "beryllium": (58, 143, 100),
-    "fissile-matter": (94, 152, 142),  # need to fix
-    "dormant-cyst": (218, 132, 78),  # need to fix
+    "fissile-matter": (94, 152, 141),
+    "dormant-cyst": (223, 130, 77),
     "tungsten": (118, 138, 154),
     "oxide": (228, 255, 214),
     "carbide": (137, 118, 154),
@@ -82,13 +82,20 @@ COLORS = {
 MAX_WIDTH = 128
 MAX_HEIGHT = 128
 
-def map_to_nearest_color(pixel, colors):
-    color_array = np.array(list(colors.values()), dtype=np.float32)
-    pixel_array = np.array(pixel, dtype=np.float32)
-    distances = np.sum((color_array - pixel_array) ** 2, axis=1)
-    nearest_index = np.argmin(distances)
-    nearest_color = list(colors.values())[nearest_index]
-    return nearest_color
+def convert_image_to_22_colors(image):
+    pixels = np.array(image, dtype=np.float32)
+    color_array = np.array(list(COLORS.values()), dtype=np.float32)
+    height, width, _ = pixels.shape
+    
+    # Vectorized computation of distances and finding the nearest color
+    reshaped_pixels = pixels.reshape(-1, 3)
+    distances = np.sum((color_array[None, :, :] - reshaped_pixels[:, None, :]) ** 2, axis=2)
+    nearest_indices = np.argmin(distances, axis=1)
+    nearest_colors = color_array[nearest_indices]
+    
+    # Reshape the result back to the original image shape
+    new_pixels = nearest_colors.reshape(height, width, 3).astype(np.uint8)
+    return Image.fromarray(new_pixels, 'RGB'), width, height
 
 def majority_color_resize(image, scale):
     original_width, original_height = image.size
@@ -132,16 +139,6 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     target_height = math.floor(original_height * scale)
 
     return image.resize((target_width, target_height), resample), target_width, target_height
-
-def convert_image_to_22_colors(image):
-    pixels = np.array(image)
-    height, width, _ = pixels.shape
-
-    for y in range(height):
-        for x in range(width):
-            pixels[y, x] = map_to_nearest_color(pixels[y, x], COLORS)
-    
-    return Image.fromarray(pixels.astype('uint8'), 'RGB'), width, height
 
 def image_to_scheme(image, width, height):
     scheme = Schematic()
