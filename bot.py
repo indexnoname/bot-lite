@@ -55,28 +55,28 @@ import math
 from pymsch import Schematic, Block, Content
 
 COLORS = {
-    "copper":(217,157,115),
-    "lead":(140,127,169),
-    "metaglass":(235,238,245),
-    "graphite":(178,198,210),
-    "sand":(247,203,164),
-    "coal":(39,39,39),
-    "titanium":(141,161,227),
-    "thorium":(249,163,199),
-    "scrap":(119,119,119),
-    "silicon":(83,86,92),
-    "plastanium":(203,217,127),
-    "phase-fabric":(244,186,110),
-    "surge-alloy":(243,233,121),
-    "spore-pod":(116,87,206),
-    "blast-compound":(255,121,94),
-    "pyratite":(255,170,95),
-    "beryllium":(58,143,100),
-    "fissile-matter":(94, 152, 142),#need to fix
-    "dormant-cyst":(218, 132, 78),  #need to fix
-    "tungsten":(118,138,154),
-    "oxide":(228,255,214),
-    "carbide":(137,118,154),
+    "copper": (217, 157, 115),
+    "lead": (140, 127, 169),
+    "metaglass": (235, 238, 245),
+    "graphite": (178, 198, 210),
+    "sand": (247, 203, 164),
+    "coal": (39, 39, 39),
+    "titanium": (141, 161, 227),
+    "thorium": (249, 163, 199),
+    "scrap": (119, 119, 119),
+    "silicon": (83, 86, 92),
+    "plastanium": (203, 217, 127),
+    "phase-fabric": (244, 186, 110),
+    "surge-alloy": (243, 233, 121),
+    "spore-pod": (116, 87, 206),
+    "blast-compound": (255, 121, 94),
+    "pyratite": (255, 170, 95),
+    "beryllium": (58, 143, 100),
+    "fissile-matter": (94, 152, 142),  # need to fix
+    "dormant-cyst": (218, 132, 78),  # need to fix
+    "tungsten": (118, 138, 154),
+    "oxide": (228, 255, 214),
+    "carbide": (137, 118, 154),
 }
 
 MAX_WIDTH = 128
@@ -96,18 +96,17 @@ def majority_color_resize(image, scale):
     target_height = math.floor(original_height * scale)
 
     resized_image = Image.new('RGB', (target_width, target_height))
-
-    block_width = original_width / target_width
-    block_height = original_height / target_height
+    pixels = np.array(image)
 
     for y in range(target_height):
         for x in range(target_width):
-            color_counts = Counter()
-            for by in range(math.floor(y * block_height), math.ceil((y + 1) * block_height)):
-                for bx in range(math.floor(x * block_width), math.ceil((x + 1) * block_width)):
-                    color = image.getpixel((bx, by))
-                    color_counts[color] += 1
-            majority_color = color_counts.most_common(1)[0][0]
+            block_pixels = pixels[
+                math.floor(y * original_height / target_height): math.ceil((y + 1) * original_height / target_height),
+                math.floor(x * original_width / target_width): math.ceil((x + 1) * original_width / target_width)
+            ]
+            flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
+            color_counts = Counter(map(tuple, flat_pixels))
+            majority_color = max(color_counts, key=color_counts.get)
             resized_image.putpixel((x, y), majority_color)
     
     return resized_image, target_width, target_height
@@ -119,7 +118,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
         return majority_color_resize(image, scale)
     else:
         resample = Image.LANCZOS
-        
+
     original_width, original_height = image.size
     scale = scale / 100
     scaleW = MAX_WIDTH / original_width
@@ -127,9 +126,8 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     scale = min(scale, scaleW, scaleH)
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
-    
-    return image.resize((target_width, target_height), resample), target_width, target_height
 
+    return image.resize((target_width, target_height), resample), target_width, target_height
 
 def convert_image_to_22_colors(image):
     pixels = np.array(image)
@@ -191,6 +189,3 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     output_file = image_to_scheme(converted_image, new_width, new_height)
 
     await ctx.send(file=discord.File(output_file))
-
-# Run the bot with your token
-bot.run(config['token'])
