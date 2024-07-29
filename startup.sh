@@ -13,8 +13,11 @@ fi
 source botvenv/bin/activate
 
 # check if discord.py is installed, if not, install it
-if ! python -c "import discord" &> /dev/null; then
+if ! python -c "import discord.py" &> /dev/null; then
     pip3 install discord.py
+fi
+if ! python -c "import numpy" &> /dev/null; then
+    pip3 install numpy
 fi
 
 # run the bot script
