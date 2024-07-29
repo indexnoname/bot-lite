@@ -25,6 +25,9 @@ fi
 if ! python -c "import pymsch" &> /dev/null; then
     pip3 install pymsch
 fi
+if ! python -c "import pyperclip" &> /dev/null; then
+    pip3 install pyperclip
+fi
 
 # run the bot script
 python3 bot.py
