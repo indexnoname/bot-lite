@@ -101,9 +101,9 @@ def majority_color_resize(image, scale):
                 math.floor(x * original_width / target_width): math.ceil((x + 1) * original_width / target_width)
             ]
             flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
-            color_counts = Counter(map(tuple, flat_pixels))
-            majority_color = max(color_counts, key=color_counts.get)
-            resized_image.putpixel((x, y), majority_color)
+            unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
+            majority_color = unique[np.argmax(counts)]
+            resized_image.putpixel((x, y), tuple(majority_color))
     
     return resized_image, target_width, target_height
 
@@ -145,7 +145,6 @@ def convert_image_to_scheme(image):
     # Create the schematic
     scheme = Schematic()
     scheme.bounds = (height, width)
-    blocks = {}
 
     for y in range(height):
         for x in range(width):
@@ -154,7 +153,6 @@ def convert_image_to_scheme(image):
             if item:
                 block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
                 scheme.add_block(block)
-                blocks[f"{x}_{y}"] = block
                 block.set_config(Content[item.upper().replace('-', '_')])
 
     scheme.name = "image"
