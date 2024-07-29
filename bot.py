@@ -14,16 +14,12 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Function to execute a shell command and return the output
-def execute_shell_command(command):
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    return result.stdout
+def execute(command):
+    return subprocess.run(command, shell=True, capture_output=True, text=True).stdout
 
 # Function to get the list of models from ollama list
 def get_model_list():
-    output = execute_shell_command('ollama list')
-    lines = output.splitlines()
-    model_names = [line.split()[0] for line in lines[1:]]  # Skip the header line and get the first word of each line
-    return model_names
+    return [line.split()[0] for line in execute('ollama list').splitlines()[1:]]
 
 @bot.event
 async def on_ready():
@@ -31,31 +27,26 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    channel = bot.get_channel(info['welcome_channel_id'])
+    channel = bot.get_channel(config['welcome_channel_id'])
     if channel:
         await channel.send(f'Hello {member.mention}! Welcome to the server!')
 
 # Command to list all AI models in Ollama
 @bot.command(name='ailist')
 async def ailist(ctx):
-    output = execute_shell_command('ollama list')
-    await ctx.send(f"Available models:\n```\n{output}\n```")
-
-
+    await ctx.send(f"Available models:\n```\n{execute('ollama list')}\n```")
 
 # Command to run a specific model in Ollama
 @bot.command(name='airun')
 async def airun(ctx, model: str, *, prompt: str):
     # Check if the model exists
-    model_names = get_model_list()
-    if model not in model_names:
+    if model not in get_model_list():
         await ctx.send(f"Model '{model}' not found in Ollama.")
         return
 
     # Run the model
     await ctx.send(f"Running model '{model}'...")
-    out = execute_shell_command(f'ollama run {model} {prompt}]')
-    await ctx.send(out)
+    await ctx.send(execute(f'ollama run {model} {prompt}]'))
 
 # Run the bot with your token
 bot.run(config['token'])
