@@ -13,11 +13,14 @@ fi
 source botvenv/bin/activate
 
 # check if discord.py is installed, if not, install it
-if ! python -c "import discord.py" &> /dev/null; then
+if ! python -c "import discord" &> /dev/null; then
     pip3 install discord.py
 fi
-if ! python -c "import numpy" &> /dev/null; then
+if ! python -c "import numpy as np" &> /dev/null; then
     pip3 install numpy
+fi
+if ! python -c "from PIL import image" &> /dev/null; then
+    pip3 install Pillow
 fi
 
 # run the bot script
