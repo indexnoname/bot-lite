@@ -11,19 +11,20 @@ fi
 # activate the virtual environment
 source botvenv/bin/activate
 
-# list of required packages
+# list of required packages and their import checks
+declare -A REQUIRED_PACKAGES
 REQUIRED_PACKAGES=(
-    discord.py
-    numpy
-    Pillow
-    pymsch
-    pyperclip
+    ["discord"]="discord"
+    ["numpy"]="numpy"
+    ["Pillow"]="PIL"
+    ["pymsch"]="pymsch"
+    ["pyperclip"]="pyperclip"
 )
 
 # install missing packages
-for package in "${REQUIRED_PACKAGES[@]}"; do
-    if ! pip list | grep -F "$package" &> /dev/null; then
-        pip install "$package"
+for package in "${!REQUIRED_PACKAGES[@]}"; do
+    if ! python -c "import ${REQUIRED_PACKAGES[$package]}" &> /dev/null; then
+        pip3 install "$package"
     fi
 done
 
