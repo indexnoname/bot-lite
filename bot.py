@@ -66,14 +66,14 @@ COLORS = {
     "scrap": (119, 119, 119),
     "silicon": (83, 86, 92),
     "plastanium": (203, 217, 127),
-    "phase-fabric": (244, 186, 110),
-    "surge-alloy": (243, 233, 121),
-    "spore-pod": (116, 87, 206),
-    "blast-compound": (255, 121, 94),
+    "phase_fabric": (244, 186, 110),
+    "surge_alloy": (243, 233, 121),
+    "spore_pod": (116, 87, 206),
+    "blast_compound": (255, 121, 94),
     "pyratite": (255, 170, 95),
     "beryllium": (58, 143, 100),
-    "fissile-matter": (94, 152, 141),
-    "dormant-cyst": (223, 130, 77),
+    "fissile_matter": (94, 152, 141),
+    "dormant_cyst": (223, 130, 77),
     "tungsten": (118, 138, 154),
     "oxide": (228, 255, 214),
     "carbide": (137, 118, 154),
@@ -162,9 +162,9 @@ def convert_image_to_scheme(image):
             color = tuple(new_pixels[y, x])
             item = next((item for item, c in COLORS.items() if c == color), None)
             if item:
-                block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
-                scheme.add_block(block)
-                block.set_config(Content[item.upper().replace('-', '_')])
+                # Flip the y-coordinate
+                scheme.add_block(Block(Content.SORTER, x, height - y - 1, None, 0))
+                block.set_config(Content[item])
 
     scheme.name = "image"
     scheme.write_file("scheme.msch")
