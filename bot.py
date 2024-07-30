@@ -162,11 +162,10 @@ def convert_image_to_scheme(image):
 
     for y in range(height):
         for x in range(width):
-            color = tuple(new_pixels[y, x])
-            if color in config_map:
-                block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
-                scheme.add_block(block)
-                block.set_config(config_map[color])
+            color = tuple(new_pixels[y, x])            
+            block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
+            scheme.add_block(block)
+            block.set_config(config_map[color])
 
     scheme.name = "image"
     scheme.write_file("scheme.msch")
