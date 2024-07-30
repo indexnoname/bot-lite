@@ -57,7 +57,7 @@ import time
 COLORS = {
     "COPPER": (217, 157, 115),
     "LEAD": (140, 127, 169),
-    "METAGLASS": (235, 238, 245),
+    "METAGLASS": (255, 255, 255),
     "GRAPHITE": (178, 198, 210),
     "SAND": (247, 203, 164),
     "COAL": (39, 39, 39),
