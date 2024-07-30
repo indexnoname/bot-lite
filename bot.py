@@ -163,7 +163,7 @@ def convert_image_to_scheme(image):
             item = next((item for item, c in COLORS.items() if c == color), None)
             if item:
                 # Flip the y-coordinate
-                block = Block(Content.SORTER)
+                block = Block(Content.SORTER, x, height - y - 1, None, 0)
                 scheme.add_block(block)
                 block.set_config(Content[item])
 
