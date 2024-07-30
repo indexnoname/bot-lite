@@ -68,7 +68,7 @@ COLORS = {
     "PLASTANIUM": (203, 217, 127),
     "PHASE_FABRIC": (244, 186, 110),
     "SURGE_ALLOY": (243, 233, 121),
-    "SPORT_POD": (116, 87, 206),
+    "SPORE_POD": (116, 87, 206),
     "BLAST_COMPOUND": (255, 121, 94),
     "PYRATITE": (255, 170, 95),
     "BERYLLIUM": (58, 143, 100),
