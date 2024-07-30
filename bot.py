@@ -161,11 +161,10 @@ def convert_image_to_scheme(image):
     scheme.bounds = (height, width)
 
     for y in range(height):
-        for x in range(width):
-            color = tuple(new_pixels[y, x])            
+        for x in range(width):       
             block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
             scheme.add_block(block)
-            block.set_config(config_map[color])
+            block.set_config(config_map[tuple(new_pixels[y, x])])
 
     scheme.name = "image"
     scheme.write_file("scheme.msch")
