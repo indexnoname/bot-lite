@@ -153,6 +153,9 @@ def convert_image_to_scheme(image):
     # Timer for schematic creation
     schematic_creation_start = time.time()
 
+    # Precompute configurations
+    config_map = {tuple(v): Content[k] for k, v in COLORS.items()}
+
     # Create the schematic
     scheme = Schematic()
     scheme.bounds = (height, width)
@@ -160,12 +163,10 @@ def convert_image_to_scheme(image):
     for y in range(height):
         for x in range(width):
             color = tuple(new_pixels[y, x])
-            item = next((item for item, c in COLORS.items() if c == color), None)
-            if item:
-                # Flip the y-coordinate
-                block = Block(Content.SORTER, x, height - y - 1, None, 0)
+            if color in config_map:
+                block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
                 scheme.add_block(block)
-                block.set_config(Content[item])
+                block.set_config(config_map[color])
 
     scheme.name = "image"
     scheme.write_file("scheme.msch")
