@@ -162,9 +162,9 @@ def convert_image_to_scheme(image):
 
     for y in range(height):
         for x in range(width):       
-            block = Block(Content.SORTER, x, height - y - 1, None, 0)  # Flip the y-coordinate
+            block = Block(Content.SORTER, x, height - y - 1, config_map[tuple(new_pixels[y, x])], 0)  # Flip the y-coordinate
             scheme.add_block(block)
-            block.set_config(config_map[tuple(new_pixels[y, x])])
+            #block.set_config(config_map[tuple(new_pixels[y, x])]) # SORTER = ContentBlock(236, 1)
 
     scheme.name = "image"
     scheme.write_file("scheme.msch")
@@ -211,3 +211,28 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
 # Run the bot with your token
 bot.run(config['token'])
+
+'''
+    COPPER = ContentType(ContentTypes.ITEM, 0)
+    LEAD = ContentType(ContentTypes.ITEM, 1)
+    METAGLASS = ContentType(ContentTypes.ITEM, 2)
+    GRAPHITE = ContentType(ContentTypes.ITEM, 3)
+    SAND = ContentType(ContentTypes.ITEM, 4)
+    COAL = ContentType(ContentTypes.ITEM, 5)
+    TITANIUM = ContentType(ContentTypes.ITEM, 6)
+    THORIUM = ContentType(ContentTypes.ITEM, 7)
+    SCRAP = ContentType(ContentTypes.ITEM, 8)
+    SILICON = ContentType(ContentTypes.ITEM, 9)
+    PLASTANIUM = ContentType(ContentTypes.ITEM, 10)
+    PHASE_FABRIC = ContentType(ContentTypes.ITEM, 11)
+    SURGE_ALLOY = ContentType(ContentTypes.ITEM, 12)
+    SPORE_POD = ContentType(ContentTypes.ITEM, 13)
+    BLAST_COMPOUND = ContentType(ContentTypes.ITEM, 14)
+    PYRATITE = ContentType(ContentTypes.ITEM, 15)
+    BERYLLIUM = ContentType(ContentTypes.ITEM, 16)
+    TUNGSTEN = ContentType(ContentTypes.ITEM, 17)
+    OXIDE = ContentType(ContentTypes.ITEM, 18)
+    CARBIDE = ContentType(ContentTypes.ITEM, 19)
+    FISSILE_MATTER = ContentType(ContentTypes.ITEM, 20)
+    DORMANT_CYST = ContentType(ContentTypes.ITEM, 21)
+'''
