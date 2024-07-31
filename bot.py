@@ -50,33 +50,31 @@ async def airun(ctx, model: str, *, prompt: str):
 
 import numpy as np
 from PIL import Image
-import math
-from pymsch import Schematic, Block, Content
-import time
+import struct, zlib, base64, time, math
 
 COLORS = {
-    "COPPER": (217, 157, 115),
-    "LEAD": (140, 127, 169),
-    "METAGLASS": (235, 238, 245),
-    "GRAPHITE": (178, 198, 210),
-    "SAND": (247, 203, 164),
-    "COAL": (39, 39, 39),
-    "TITANIUM": (141, 161, 227),
-    "THORIUM": (249, 163, 199),
-    "SCRAP": (119, 119, 119),
-    "SILICON": (83, 86, 92),
-    "PLASTANIUM": (203, 217, 127),
-    "PHASE_FABRIC": (244, 186, 110),
-    "SURGE_ALLOY": (243, 233, 121),
-    "SPORE_POD": (116, 87, 206),
-    "BLAST_COMPOUND": (255, 121, 94),
-    "PYRATITE": (255, 170, 95),
-    "BERYLLIUM": (58, 143, 100),
-    "FISSILE_MATTER": (94, 152, 141),
-    "DORMANT_CYST": (223, 130, 77),
-    "TUNGSTEN": (118, 138, 154),
-    "OXIDE": (228, 255, 214),
-    "CARBIDE": (137, 118, 154),
+    0: (217, 157, 115),
+    1: (140, 127, 169),
+    2: (235, 238, 245),
+    3: (178, 198, 210),
+    4: (247, 203, 164),
+    5: (39, 39, 39),
+    6: (141, 161, 227),
+    7: (249, 163, 199),
+    8: (119, 119, 119),
+    9: (83, 86, 92),
+    10: (203, 217, 127),
+    11: (244, 186, 110),
+    12: (243, 233, 121),
+    13: (116, 87, 206),
+    14: (255, 121, 94),
+    15: (255, 170, 95),
+    16: (58, 143, 100),
+    17: (118, 138, 154),
+    18: (228, 255, 214),
+    19: (137, 118, 154),
+    20: (94, 152, 141),
+    21: (223, 130, 77),
 }
 
 MAX_WIDTH = 128
@@ -125,6 +123,10 @@ def resize_image(image, scale, resample_method='LANCZOS'):
 
     return image.resize((target_width, target_height), resample), target_width, target_height
 
+
+def txtbin(txt = str):
+    return struct.pack(">H", len(txt))+txt.encode("UTF-8")
+
 def convert_image_to_scheme(image):
     # Start timer for the entire function
     start_time = time.time()
@@ -157,17 +159,11 @@ def convert_image_to_scheme(image):
     config_map = {tuple(v): Content[k] for k, v in COLORS.items()}
 
     # Create the schematic
-    scheme = Schematic()
-    scheme.bounds = (height, width)
-
+    buffer += struct.pack(">HHb", height, width, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin(desc) + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", len(tiles))
+    
     for y in range(height):
-        for x in range(width):       
-            block = Block(Content.SORTER, x, height - y - 1, config_map[tuple(new_pixels[y, x])], 0)  # Flip the y-coordinate
-            scheme.add_block(block)
-            #block.set_config(config_map[tuple(new_pixels[y, x])]) # SORTER = ContentBlock(236, 1)
-
-    scheme.name = "image"
-    scheme.write_file("scheme.msch")
+        for x in range(width): 
+            buffer += struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0)
 
     # End timer for schematic creation
     schematic_creation_end = time.time()
@@ -177,7 +173,7 @@ def convert_image_to_scheme(image):
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
 
-    return "scheme.msch"
+    return (b"msch\x01" + zlib.compress(buffer))
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
@@ -211,28 +207,3 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
 # Run the bot with your token
 bot.run(config['token'])
-
-'''
-    COPPER = ContentType(ContentTypes.ITEM, 0)
-    LEAD = ContentType(ContentTypes.ITEM, 1)
-    METAGLASS = ContentType(ContentTypes.ITEM, 2)
-    GRAPHITE = ContentType(ContentTypes.ITEM, 3)
-    SAND = ContentType(ContentTypes.ITEM, 4)
-    COAL = ContentType(ContentTypes.ITEM, 5)
-    TITANIUM = ContentType(ContentTypes.ITEM, 6)
-    THORIUM = ContentType(ContentTypes.ITEM, 7)
-    SCRAP = ContentType(ContentTypes.ITEM, 8)
-    SILICON = ContentType(ContentTypes.ITEM, 9)
-    PLASTANIUM = ContentType(ContentTypes.ITEM, 10)
-    PHASE_FABRIC = ContentType(ContentTypes.ITEM, 11)
-    SURGE_ALLOY = ContentType(ContentTypes.ITEM, 12)
-    SPORE_POD = ContentType(ContentTypes.ITEM, 13)
-    BLAST_COMPOUND = ContentType(ContentTypes.ITEM, 14)
-    PYRATITE = ContentType(ContentTypes.ITEM, 15)
-    BERYLLIUM = ContentType(ContentTypes.ITEM, 16)
-    TUNGSTEN = ContentType(ContentTypes.ITEM, 17)
-    OXIDE = ContentType(ContentTypes.ITEM, 18)
-    CARBIDE = ContentType(ContentTypes.ITEM, 19)
-    FISSILE_MATTER = ContentType(ContentTypes.ITEM, 20)
-    DORMANT_CYST = ContentType(ContentTypes.ITEM, 21)
-'''
