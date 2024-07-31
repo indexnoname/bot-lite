@@ -196,7 +196,7 @@ def convert_image_to_scheme(image):
     # End timer for the entire function
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
-    file = open(file_path, 'wb')
+    file = open("scheme.msch", 'wb')
     file.write((b"msch\x01" + zlib.compress(buffer)))
     return "scheme.msch"
 
