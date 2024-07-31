@@ -198,7 +198,7 @@ def convert_image_to_scheme(image):
     print(f"Total conversion time: {end_time - start_time} seconds")
     file = open(file_path, 'wb')
     file.write((b"msch\x01" + zlib.compress(buffer)))
-    return scheme.msch
+    return "scheme.msch"
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
