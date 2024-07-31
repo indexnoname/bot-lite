@@ -76,30 +76,6 @@ COLORS = {
     20: (94, 152, 141),
     21: (223, 130, 77),
 }
-Content = {  # Assuming Content is a dictionary that maps color indices to block IDs
-    0: 1,
-    1: 2,
-    2: 3,
-    3: 4,
-    4: 5,
-    5: 6,
-    6: 7,
-    7: 8,
-    8: 9,
-    9: 10,
-    10: 11,
-    11: 12,
-    12: 13,
-    13: 14,
-    14: 15,
-    15: 16,
-    16: 17,
-    17: 18,
-    18: 19,
-    19: 20,
-    20: 21,
-    21: 22
-}
 
 MAX_WIDTH = 128
 MAX_HEIGHT = 128
@@ -179,7 +155,7 @@ def convert_image_to_scheme(image):
     schematic_creation_start = time.time()
 
     # Precompute configurations
-    config_map = {tuple(v): Content[k] for k, v in COLORS.items()}
+    config_map = {tuple(v): k for k, v in COLORS.items()}
 
     # Create the schematic
     buffer = bytearray()
