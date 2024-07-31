@@ -199,8 +199,6 @@ def convert_image_to_scheme(image):
 
     return base64.b64encode(b"msch\x01" + zlib.compress(buffer)).decode()
 
-bot = commands.Bot(command_prefix='!')
-
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     """
