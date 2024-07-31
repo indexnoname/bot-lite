@@ -76,6 +76,30 @@ COLORS = {
     20: (94, 152, 141),
     21: (223, 130, 77),
 }
+Content = {  # Assuming Content is a dictionary that maps color indices to block IDs
+    0: 1,
+    1: 2,
+    2: 3,
+    3: 4,
+    4: 5,
+    5: 6,
+    6: 7,
+    7: 8,
+    8: 9,
+    9: 10,
+    10: 11,
+    11: 12,
+    12: 13,
+    13: 14,
+    14: 15,
+    15: 16,
+    16: 17,
+    17: 18,
+    18: 19,
+    19: 20,
+    20: 21,
+    21: 22
+}
 
 MAX_WIDTH = 128
 MAX_HEIGHT = 128
@@ -123,7 +147,6 @@ def resize_image(image, scale, resample_method='LANCZOS'):
 
     return image.resize((target_width, target_height), resample), target_width, target_height
 
-
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
 
@@ -159,7 +182,8 @@ def convert_image_to_scheme(image):
     config_map = {tuple(v): Content[k] for k, v in COLORS.items()}
 
     # Create the schematic
-    buffer += struct.pack(">HHb", height, width, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin(desc) + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", len(tiles))
+    buffer = bytearray()
+    buffer += struct.pack(">HHb", height, width, 2)+txtbin("name")+txtbin("name")+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
     
     for y in range(height):
         for x in range(width): 
@@ -173,7 +197,9 @@ def convert_image_to_scheme(image):
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
 
-    return (b"msch\x01" + zlib.compress(buffer))
+    return base64.b64encode(b"msch\x01" + zlib.compress(buffer)).decode()
+
+bot = commands.Bot(command_prefix='!')
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
