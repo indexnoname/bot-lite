@@ -106,9 +106,11 @@ def majority_color_resize(image, scale):
         for x in range(target_width):
             start_x = math.floor(x * origtotargetw)
             end_x = min(math.ceil((x + 1) * origtotargetw), original_width)
+
+            block_pixels = pixels[start_y:end_y, start_x:end_x]
             
             # Find the majority color
-            unique, counts = np.unique(block_pixels.reshape(-1, pixels[start_y:end_y, start_x:end_x].shape[-1]), axis=0, return_counts=True)
+            unique, counts = np.unique(block_pixels.reshape(-1, block_pixels.shape[-1]), axis=0, return_counts=True)
             new_pixels[y, x] = unique[np.argmax(counts)]
             
 
