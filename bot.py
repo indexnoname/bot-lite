@@ -124,7 +124,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
 
-def convert_image_to_scheme(image):
+def convert_image_to_scheme(image, name):
     # Start timer for the entire function
     start_time = time.time()
 
@@ -153,7 +153,7 @@ def convert_image_to_scheme(image):
 
     # Create the schematic
     buffer = bytearray()
-    buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin("scheme")+txtbin("description")+txtbin("This image was created by лади lite #9839") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
+    buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("This image was created by лади lite #9839") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
     
     for y in range(height):
         for x in range(width): 
@@ -184,11 +184,11 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     image_file = ctx.message.attachments[0].filename
     await ctx.message.attachments[0].save(image_file)
     
-    image = Image.open(ctx.message.attachments[0]).convert('RGB')
+    image = Image.open(image_file).convert('RGB')
 
 
     resized_image, new_width, new_height = resize_image(image, scale, resample_method)
-    convert_image_to_scheme(resized_image)
+    convert_image_to_scheme(resized_image, image_file)
 
     await ctx.send(file=discord.File("scheme.msch"))
 
