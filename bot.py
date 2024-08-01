@@ -110,7 +110,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
 
     if resample_method == 'MAJORITY':
         return majority_color_resize(image, scale)
-
+    
     original_width, original_height = image.size
     scale = scale / 100
     scaleW = MAX_WIDTH / original_width
@@ -119,7 +119,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
 
-    return image.resize((target_width, target_height), resample_method.lower()), target_width, target_height
+    return image.resize((target_width, target_height), resample_method), target_width, target_height
 
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
@@ -186,8 +186,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     
     image = Image.open(image_file).convert('RGB')
 
-    resample_method = resample_method.upper
-    resized_image, new_width, new_height = resize_image(image, scale, resample_method)
+    resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper())
     convert_image_to_scheme(resized_image, image_file)
 
     await ctx.send(file=discord.File("scheme.msch"))
