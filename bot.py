@@ -87,47 +87,29 @@ def majority_color_resize(image, scale):
 
     start_time = time.time()
 
-    # Convert image to NumPy array
-    pixels = np.array(image)
     resized_image = Image.new('RGB', (target_width, target_height))
-
-    # Calculate block sizes
+    pixels = np.array(image)
     origtotargeth = original_height / target_height
     origtotargetw = original_width / target_width
-
-    # Create an array to store the resized image's pixels
-    new_pixels = np.zeros((target_height, target_width, 3), dtype=np.uint8)
-
-    # Process the image in blocks
     for y in range(target_height):
-        start_y = math.floor(y * origtotargeth)
-        end_y = min(math.ceil((y + 1) * origtotargeth), original_height)
-
         for x in range(target_width):
-            start_x = math.floor(x * origtotargetw)
-            end_x = min(math.ceil((x + 1) * origtotargetw), original_width)
-
-            block_pixels = pixels[start_y:end_y, start_x:end_x]
-            
-            # Find the majority color
-            unique, counts = np.unique(block_pixels.reshape(-1, block_pixels.shape[-1]), axis=0, return_counts=True)
-            new_pixels[y, x] = unique[np.argmax(counts)]
-            
-
-    # Convert the NumPy array back to an image
-    resized_image = Image.fromarray(new_pixels)
+            block_pixels = pixels[
+                math.floor(y * origtotargeth): math.ceil((y + 1) * origtotargeth),
+                math.floor(x * origtotargetw): math.ceil((x + 1) * origtotargetw)
+            ]
+            flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
+            unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
+            majority_color = unique[np.argmax(counts)]
+            resized_image.putpixel((x, y), tuple(majority_color))
 
     print(f"Total resize time: {time.time() - start_time} seconds")
-
+    
     return resized_image, target_width, target_height
 
 def resize_image(image, scale, resample_method='LANCZOS'):
-    if resample_method == 'NEAREST':
-        resample = Image.NEAREST
-    elif resample_method == 'MAJORITY':
+
+    if resample_method == 'MAJORITY':
         return majority_color_resize(image, scale)
-    else:
-        resample = Image.LANCZOS
 
     original_width, original_height = image.size
     scale = scale / 100
@@ -137,7 +119,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
 
-    return image.resize((target_width, target_height), resample), target_width, target_height
+    return image.resize((target_width, target_height), resample_method.lower()), target_width, target_height
 
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
@@ -202,14 +184,8 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     image_file = ctx.message.attachments[0].filename
     await ctx.message.attachments[0].save(image_file)
     
-    image = Image.open(image_file).convert('RGB')
+    image = Image.open(ctx.message.attachments[0]).convert('RGB')
 
-    if resample_method.lower() == 'mix':
-        resample_method = 'LANCZOS'
-    elif resample_method.lower() == 'majority':
-        resample_method = 'MAJORITY'
-    else:
-        resample_method = 'NEAREST'
 
     resized_image, new_width, new_height = resize_image(image, scale, resample_method)
     convert_image_to_scheme(resized_image)
