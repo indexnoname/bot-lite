@@ -91,12 +91,13 @@ def majority_color_resize(image, scale):
 
     resized_image = Image.new('RGB', (target_width, target_height))
     pixels = np.array(image)
-
+    origtotargeth = original_height / target_height
+    origtotargetw = original_width / target_width
     for y in range(target_height):
         for x in range(target_width):
             block_pixels = pixels[
-                math.floor(y * original_height / target_height): math.ceil((y + 1) * original_height / target_height),
-                math.floor(x * original_width / target_width): math.ceil((x + 1) * original_width / target_width)
+                math.floor(y * origtotargeth): math.ceil((y + 1) * origtotargeth),
+                math.floor(x * origtotargetw): math.ceil((x + 1) * origtotargetw)
             ]
             flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
             unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
@@ -174,7 +175,6 @@ def convert_image_to_scheme(image):
     print(f"Total conversion time: {end_time - start_time} seconds")
     file = open("scheme.msch", 'wb')
     file.write((b"msch\x01" + zlib.compress(buffer)))
-    return "scheme.msch"
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
@@ -202,9 +202,9 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
         resample_method = 'NEAREST'
 
     resized_image, new_width, new_height = resize_image(image, scale, resample_method)
-    output_file = convert_image_to_scheme(resized_image)
+    convert_image_to_scheme(resized_image)
 
-    await ctx.send(file=discord.File(output_file))
+    await ctx.send(file=discord.File("scheme.msch"))
 
 # Run the bot with your token
 bot.run(config['token'])
