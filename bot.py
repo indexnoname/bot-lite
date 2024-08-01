@@ -187,7 +187,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     image = Image.open(image_file).convert('RGB')
 
 
-    resized_image, new_width, new_height = resize_image(image, scale, resample_method)
+    resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper)
     convert_image_to_scheme(resized_image, image_file)
 
     await ctx.send(file=discord.File("scheme.msch"))
