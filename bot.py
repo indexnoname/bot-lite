@@ -119,7 +119,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
 
-    return image.resize((target_width, target_height), f"Image.Resampling.{resample_method}"), target_width, target_height
+    return image.resize((target_width, target_height), Image.resample_method), target_width, target_height
 
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
