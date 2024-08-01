@@ -1,8 +1,8 @@
+from PIL import Image
+import numpy as np
 from discord.ext import commands
-import discord
-import subprocess
-import json
-import os
+import discord, subprocess, json, os, struct, zlib, base64, time, math
+
 
 # Load configuration from JSON file
 with open('config.json', 'r') as config_file:
@@ -48,10 +48,6 @@ async def airun(ctx, model: str, *, prompt: str):
     await ctx.send(f"Running model '{model}'...")
     await ctx.send(execute(f'ollama run {model} {prompt}]'))
 
-import numpy as np
-from PIL import Image
-import struct, zlib, base64, time, math
-
 COLORS = {
     0: (217, 157, 115),
     1: (140, 127, 169),
@@ -95,12 +91,15 @@ def majority_color_resize(image, scale):
     pixels = np.array(image)
     origtotargeth = original_height / target_height
     origtotargetw = original_width / target_width
+
     for y in range(target_height):
         for x in range(target_width):
-            block_pixels = pixels[
-                math.floor(y * origtotargeth): math.ceil((y + 1) * origtotargeth),
-                math.floor(x * origtotargetw): math.ceil((x + 1) * origtotargetw)
-            ]
+            start_y = math.floor(y * origtotargeth)
+            end_y = min(math.ceil((y + 1) * origtotargeth), original_height)
+            start_x = math.floor(x * origtotargetw)
+            end_x = min(math.ceil((x + 1) * origtotargetw), original_width)
+
+            block_pixels = pixels[start_y:end_y, start_x:end_x]
             flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
             unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
             majority_color = unique[np.argmax(counts)]
