@@ -87,26 +87,39 @@ def majority_color_resize(image, scale):
 
     start_time = time.time()
 
-    resized_image = Image.new('RGB', (target_width, target_height))
+    # Convert image to NumPy array
     pixels = np.array(image)
+    resized_image = Image.new('RGB', (target_width, target_height))
+
+    # Calculate block sizes
     origtotargeth = original_height / target_height
     origtotargetw = original_width / target_width
 
+    # Create an array to store the resized image's pixels
+    new_pixels = np.zeros((target_height, target_width, 3), dtype=np.uint8)
+
+    # Process the image in blocks
     for y in range(target_height):
+        start_y = math.floor(y * origtotargeth)
+        end_y = min(math.ceil((y + 1) * origtotargeth), original_height)
+
         for x in range(target_width):
-            start_y = math.floor(y * origtotargeth)
-            end_y = min(math.ceil((y + 1) * origtotargeth), original_height)
             start_x = math.floor(x * origtotargetw)
             end_x = min(math.ceil((x + 1) * origtotargetw), original_width)
 
             block_pixels = pixels[start_y:end_y, start_x:end_x]
             flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
+            
+            # Find the majority color
             unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
             majority_color = unique[np.argmax(counts)]
-            resized_image.putpixel((x, y), tuple(majority_color))
+            new_pixels[y, x] = majority_color
+
+    # Convert the NumPy array back to an image
+    resized_image = Image.fromarray(new_pixels)
 
     print(f"Total resize time: {time.time() - start_time} seconds")
-    
+
     return resized_image, target_width, target_height
 
 def resize_image(image, scale, resample_method='LANCZOS'):
