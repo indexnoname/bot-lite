@@ -89,6 +89,8 @@ def majority_color_resize(image, scale):
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
 
+    start_time = time.time()
+
     resized_image = Image.new('RGB', (target_width, target_height))
     pixels = np.array(image)
     origtotargeth = original_height / target_height
@@ -103,6 +105,8 @@ def majority_color_resize(image, scale):
             unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
             majority_color = unique[np.argmax(counts)]
             resized_image.putpixel((x, y), tuple(majority_color))
+
+    print(f"Total resize time: {time.time() - start_time} seconds")
     
     return resized_image, target_width, target_height
 
@@ -131,9 +135,6 @@ def convert_image_to_scheme(image):
     # Start timer for the entire function
     start_time = time.time()
 
-    # Timer for color conversion
-    color_conversion_start = time.time()
-
     # Convert image to 22 colors
     pixels = np.array(image, dtype=np.float32)
     color_array = np.array(list(COLORS.values()), dtype=np.float32)
@@ -149,12 +150,11 @@ def convert_image_to_scheme(image):
     new_pixels = nearest_colors.reshape(height, width, 3).astype(np.uint8)
 
     # End timer for color conversion
-    color_conversion_end = time.time()
-    print(f"Color conversion time: {color_conversion_end - color_conversion_start} seconds")
+
 
     # Timer for schematic creation
     schematic_creation_start = time.time()
-
+    print(f"Color conversion time: {schematic_creation_start - start_time} seconds")
     # Precompute configurations
     config_map = {tuple(v): k for k, v in COLORS.items()}
 
@@ -171,8 +171,7 @@ def convert_image_to_scheme(image):
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
 
     # End timer for the entire function
-    end_time = time.time()
-    print(f"Total conversion time: {end_time - start_time} seconds")
+    print(f"Total conversion time: {time.time() - start_time} seconds")
     file = open("scheme.msch", 'wb')
     file.write((b"msch\x01" + zlib.compress(buffer)))
 
