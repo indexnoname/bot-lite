@@ -181,10 +181,10 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
         await ctx.send('Please attach an image.')
         return
 
-    image_file = ctx.message.attachments[0].filename
-    await ctx.message.attachments[0].save(image_file)
+    image = ctx.message.attachments[0].filename
+    await ctx.message.attachments[0].save(image)
     
-    image = Image.open(image_file).convert('RGB')
+    image = Image.open(image).convert('RGB')
 
     resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper())
     convert_image_to_scheme(resized_image, 'image_file', new_width, new_height)
