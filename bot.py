@@ -154,7 +154,7 @@ def convert_image_to_scheme(image):
     print(f"Total conversion time: {end_time - start_time} seconds")
     file = open("scheme.msch", 'wb')
     file.write((b"msch\x01" + zlib.compress(buffer)))
-    
+
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     """
@@ -178,7 +178,8 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     else:
         resample_method = 'NEAREST'
     resized_image, new_width, new_height = resize_image(image, scale, resample_method)
-    output_file = convert_image_to_scheme(resized_image)
+    convert_image_to_scheme(resized_image)
+
     await ctx.send(file=discord.File("scheme.msch"))
 # Run the bot with your token
 bot.run(config['token'])
