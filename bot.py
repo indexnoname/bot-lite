@@ -113,7 +113,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     return image.resize((target_width, target_height), resample), target_width, target_height
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
-def convert_image_to_scheme(image):
+def convert_image_to_scheme(image, name):
     # Start timer for the entire function
     start_time = time.time()
     # Timer for color conversion
@@ -141,7 +141,7 @@ def convert_image_to_scheme(image):
 
     # Create the schematic
     buffer = bytearray()
-    buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin("name")+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
+    buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
 
     for y in range(height):
         for x in range(width): 
@@ -178,7 +178,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     else:
         resample_method = 'NEAREST'
     resized_image, new_width, new_height = resize_image(image, scale, resample_method)
-    convert_image_to_scheme(resized_image)
+    convert_image_to_scheme(resized_image, image_file)
 
     await ctx.send(file=discord.File("scheme.msch"))
 # Run the bot with your token
