@@ -124,7 +124,7 @@ def resize_image(image, scale, resample_method='LANCZOS'):
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
 
-def convert_image_to_scheme(image, name):
+def convert_image_to_scheme(image, name, height, width):
     # Start timer for the entire function
     start_time = time.time()
 
@@ -187,7 +187,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     image = Image.open(image_file).convert('RGB')
 
     resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper())
-    convert_image_to_scheme(resized_image, 'image_file')
+    convert_image_to_scheme(resized_image, 'image_file', new_width, new_height)
 
     await ctx.send(file=discord.File("scheme.msch"))
 
