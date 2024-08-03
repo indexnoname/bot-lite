@@ -157,7 +157,7 @@ def convert_image_to_scheme(image, name, height, width):
     
     for y in range(height):
         for x in range(width): 
-            buffer += struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, 1, 0)
+            buffer += struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0)
 
     # End timer for schematic creation
     schematic_creation_end = time.time()
