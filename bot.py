@@ -141,7 +141,6 @@ def convert_image_to_scheme(image):
 
     # Create the schematic
     buffer = bytearray()
-    buffer += struct.pack(">HHb", height, width, 2)+txtbin("name")+txtbin("name")+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
     buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin("name")+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
 
     for y in range(height):
