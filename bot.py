@@ -173,4 +173,11 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     scheme_file = convert_image_to_scheme(resized_image, ctx.message.attachments[0].filename)
     await ctx.send(file=discord.File(fp=scheme_file, filename="scheme.msch"))
 # Run the bot with your token
+
+while True:
+    try:
+        await bot.start(info['TOKEN'])
+    except Exception as e:
+        print(f"Network error: {e}")
+        await asyncio.sleep(60)
 bot.run(config['token'])
