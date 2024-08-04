@@ -165,11 +165,9 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     scale (int): The scale to resize the image. Default is 100 (no resizing).
     resample_method (str): The resampling method to use ('LANCZOS', 'NEAREST', 'MAJORITY'). Default is 'LANCZOS'.
     """
-    if len(ctx.message.attachments) == 0:
-        await ctx.send('Please attach an image.')
-        return
+
     if not ctx.message.attachments: return await ctx.send('Please attach an image.')
-    
+
     image_file = await ctx.message.attachments[0].read()
     image = Image.open(io.BytesIO(image_file)).convert('RGB')
     resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper())
