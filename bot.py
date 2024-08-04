@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 from discord.ext import commands
-import discord, subprocess, json, os, struct, zlib, base64, time, math
+import discord, subprocess, json, os, struct, zlib, base64, time, math, io
 
 
 # Load configuration from JSON file
@@ -154,8 +154,7 @@ def convert_image_to_scheme(image, name):
     # End timer for the entire function
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
-    file = open("scheme.msch", 'wb')
-    file.write((b"msch\x01" + zlib.compress(buffer)))
+    return io.BytesIO(b"msch\x01" + zlib.compress(buffer))
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
@@ -169,14 +168,13 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     if len(ctx.message.attachments) == 0:
         await ctx.send('Please attach an image.')
         return
-    image_file = ctx.message.attachments[0].filename
-    await ctx.message.attachments[0].save(image_file)
-    
-    image = Image.open(image_file).convert('RGB')
+
+    image_file = await ctx.message.attachments[0].read()
+    image = Image.open(io.BytesIO(image_file)).convert('RGB')
     resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper())
-    convert_image_to_scheme(resized_image, image_file)
+    scheme_file = convert_image_to_scheme(resized_image, ctx.message.attachments[0].filename)
+    await ctx.send(file=discord.File(fp=scheme_file, filename="scheme.msch"))
 
     await ctx.send(file=discord.File("scheme.msch"))
 # Run the bot with your token
-print(Image.BOX)
 bot.run(config['token'])
