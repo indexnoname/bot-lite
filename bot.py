@@ -176,5 +176,5 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
     await ctx.send(file=discord.File("scheme.msch"))
 # Run the bot with your token
-print(Image.NEAREST)
+print(Image.BOX)
 bot.run(config['token'])
