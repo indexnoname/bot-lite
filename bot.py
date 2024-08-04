@@ -103,7 +103,7 @@ def majority_color_resize(image, scale):
             resized_image.putpixel((x, y), tuple(majority_color))
     
     return resized_image, target_width, target_height
-def resize_image(image, scale, resample_method):
+def resize_image(image, scale, resample):
     if resample_method == 'MAJORITY':
         return majority_color_resize(image, scale)
     original_width, original_height = image.size
@@ -113,7 +113,8 @@ def resize_image(image, scale, resample_method):
     scale = min(scale, scaleW, scaleH)
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
-    return image.resize((target_width, target_height), resmet(resample_method)), target_width, target_height
+    resample = resmet(resample)
+    return image.resize((target_width, target_height), resample), target_width, target_height
 
 def convert_image_to_scheme(image, name):
     # Start timer for the entire function
