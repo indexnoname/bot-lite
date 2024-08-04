@@ -169,8 +169,8 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     if not ctx.message.attachments: return await ctx.send('Please attach an image.')
 
     image = Image.open(io.BytesIO(await ctx.message.attachments[0].read())).convert('RGB')
-    resized_image = resize_image(image, scale, resample_method.upper())
-    scheme_file = convert_image_to_scheme(resized_image, ctx.message.attachments[0].filename)
+    image = resize_image(image, scale, resample_method.upper())
+    scheme_file = convert_image_to_scheme(image, ctx.message.attachments[0].filename)
     await ctx.send(file=discord.File(fp=scheme_file, filename="scheme.msch"))
 # Run the bot with your token
 bot.run(config['token'])
