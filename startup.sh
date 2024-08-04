@@ -17,8 +17,6 @@ REQUIRED_PACKAGES=(
     ["discord"]="discord"
     ["numpy"]="numpy"
     ["Pillow"]="PIL"
-    ["pymsch"]="pymsch"
-    ["pyperclip"]="pyperclip"
 )
 
 # install missing packages
