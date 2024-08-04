@@ -74,6 +74,13 @@ COLORS = {
 }
 MAX_WIDTH = 128
 MAX_HEIGHT = 128
+
+def resmet(method = str):
+    return getattr(Image, method.upper())
+
+def txtbin(txt = str):
+    return struct.pack(">H", len(txt))+txt.encode("UTF-8")
+    
 def majority_color_resize(image, scale):
     original_width, original_height = image.size
     scale = scale / 100
@@ -96,13 +103,9 @@ def majority_color_resize(image, scale):
             resized_image.putpixel((x, y), tuple(majority_color))
     
     return resized_image, target_width, target_height
-def resize_image(image, scale, resample_method='LANCZOS'):
-    if resample_method == 'NEAREST':
-        resample = Image.NEAREST
-    elif resample_method == 'MAJORITY':
+def resize_image(image, scale, resample_method):
+    if resample_method == 'MAJORITY':
         return majority_color_resize(image, scale)
-    else:
-        resample = Image.LANCZOS
     original_width, original_height = image.size
     scale = scale / 100
     scaleW = MAX_WIDTH / original_width
@@ -110,9 +113,8 @@ def resize_image(image, scale, resample_method='LANCZOS'):
     scale = min(scale, scaleW, scaleH)
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
-    return image.resize((target_width, target_height), resample), target_width, target_height
-def txtbin(txt = str):
-    return struct.pack(">H", len(txt))+txt.encode("UTF-8")
+    return image.resize((target_width, target_height), resmet(resample_method)), target_width, target_height
+
 def convert_image_to_scheme(image, name):
     # Start timer for the entire function
     start_time = time.time()
