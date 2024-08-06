@@ -136,14 +136,10 @@ def convert_image_to_scheme(image, name):
     # Create the schematic
     buffer = bytearray()
     buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
-    packed_values = [
-        struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0)
-        for y in range(height)
-        for x in range(width)
-    ]
-    
-    # Extend buffer with precomputed packed values
-    buffer.extend(packed_values)
+
+    for y in range(height):
+        for x in range(width): 
+            buffer.extend(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
     # End timer for schematic creation
     schematic_creation_end = time.time()
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
