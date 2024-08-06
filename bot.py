@@ -139,7 +139,7 @@ def convert_image_to_scheme(image, name):
 
     for y in range(height):
         for x in range(width): 
-            buffer.extend(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
+            buffer += struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0)
     # End timer for schematic creation
     schematic_creation_end = time.time()
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
@@ -155,7 +155,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     
     Parameters:
     scale (int): The scale to resize the image. Default is 100 (no resizing).
-    resample_method (str): The resampling method to use ('LANCZOS', 'NEAREST', 'MAJORITY'). Default is 'LANCZOS'.
+    resample_method (str): The resampling method to use is from image (PIL) + majority. Default is 'LANCZOS'.
     """
 
     if not ctx.message.attachments: return await ctx.send('Please attach an image.')
