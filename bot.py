@@ -110,46 +110,44 @@ def resize_image(image, scale, resample_method):
 def convert_image_to_scheme(image, name):
     # Start timer for the entire function
     start_time = time.time()
-    # Timer for color conversion
-    color_conversion_start = time.time()
+    
     # Convert image to 22 colors
     pixels = np.array(image, dtype=np.float32)
     color_array = np.array(list(COLORS.values()), dtype=np.float32)
     height, width, _ = pixels.shape
-    
+
     # Vectorized computation of distances and finding the nearest color
     reshaped_pixels = pixels.reshape(-1, 3)
     distances = np.sum((color_array[None, :, :] - reshaped_pixels[:, None, :]) ** 2, axis=2)
     nearest_indices = np.argmin(distances, axis=1)
     nearest_colors = color_array[nearest_indices]
-    
+
     # Reshape the result back to the original image shape
     new_pixels = nearest_colors.reshape(height, width, 3).astype(np.uint8)
-    # End timer for color conversion
-    color_conversion_end = time.time()
-    print(f"Color conversion time: {color_conversion_end - color_conversion_start} seconds")
-    # Timer for schematic creation
-    schematic_creation_start = time.time()
+    
     # Precompute configurations
     config_map = {tuple(v): k for k, v in COLORS.items()}
 
     # Create the schematic
     buffer = bytearray()
-    buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
+    buffer += struct.pack(">HHb", width, height, 2) + txtbin("name") + txtbin(name) + txtbin("description") + txtbin("desc") + struct.pack(">b", 1) + txtbin('sorter') + struct.pack(">i", height * width)
 
+    # Optimize the inner loop
     buffer.extend(
         struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0)
         for y in range(height)
         for x in range(width)
     )
+
     # End timer for schematic creation
     schematic_creation_end = time.time()
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
+    
     # End timer for the entire function
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
     return io.BytesIO(b"msch\x01" + zlib.compress(buffer))
-
+    
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     """
