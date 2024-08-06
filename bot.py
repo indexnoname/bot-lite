@@ -72,8 +72,8 @@ COLORS = {
     20: (94, 152, 141),
     21: (223, 130, 77),
 }
-MAX_WIDTH = 128
-MAX_HEIGHT = 128
+MAX_WIDTH = 256
+MAX_HEIGHT = 256
 
 def resmet(method = str):
     return getattr(Image, method.upper())
