@@ -72,8 +72,6 @@ COLORS = {
     20: (94, 152, 141),
     21: (223, 130, 77),
 }
-MAX_WIDTH = 256
-MAX_HEIGHT = 256
 
 def resmet(method = str):
     return getattr(Image, method.upper())
@@ -101,7 +99,7 @@ def resize_image(image, scale, resample_method):
     
     original_width, original_height = image.size
 
-    scale = min(scale / 100, MAX_WIDTH / original_width, MAX_HEIGHT / original_height)
+    scale = min(scale / 100, 256 / original_width, 256 / original_height)
     target_width = math.floor(original_width * scale)
     target_height = math.floor(original_height * scale)
 
