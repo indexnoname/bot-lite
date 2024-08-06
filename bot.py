@@ -81,7 +81,7 @@ def resmet(method = str):
 def txtbin(txt = str):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
     
-def majority_color_resize(image, scale, target_width, target_height):
+def majority_color_resize(image, scale, target_width, target_height, original_width, original_height):
 
     resized_image = Image.new('RGB', (target_width, target_height))
     pixels = np.array(image)
@@ -106,7 +106,7 @@ def resize_image(image, scale, resample_method):
     target_height = math.floor(original_height * scale)
 
     if resample_method == 'MAJORITY':
-        return majority_color_resize(image, scale, target_width, target_height)
+        return majority_color_resize(image, scale, target_width, target_height, original_width, original_height)
     return image.resize((target_width, target_height), resmet(resample_method)), target_width, target_height
 
 def convert_image_to_scheme(image, name):
