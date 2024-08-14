@@ -146,7 +146,7 @@ def convert_image_to_scheme(image, name):
     # End timer for the entire function
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
-    return io.BytesIO(b"msch\x01" + zlib.compress(buffer))
+    return io.BytesIO(b"msch\x01" + zlib.compress(buffer.getvalue()))
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
