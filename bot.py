@@ -139,7 +139,7 @@ def convert_image_to_scheme(image, name):
 
     for y in range(height):
         for x in range(width): 
-            buffer.write(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
+            a = 1
     # End timer for schematic creation
     schematic_creation_end = time.time()
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
