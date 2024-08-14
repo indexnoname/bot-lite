@@ -135,7 +135,7 @@ def convert_image_to_scheme(image, name):
 
     # Create the schematic
     buffer = io.BytesIO()
-    buffer.write(struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width))
+    buffer.write(struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("this scheme created by bot-lite check git indexnoname") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width))
 
     for y in range(height):
         for x in range(width): 
