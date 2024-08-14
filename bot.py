@@ -134,19 +134,19 @@ def convert_image_to_scheme(image, name):
     config_map = {tuple(v): k for k, v in COLORS.items()}
 
     # Create the schematic
-    buffer = io.BytesIO()
-    buffer.write(struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width))
+    buffer = bytearray()
+    buffer += struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("desc") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width)
 
     for y in range(height):
         for x in range(width): 
-            buffer.write(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
+            buffer += struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0)
     # End timer for schematic creation
     schematic_creation_end = time.time()
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
     # End timer for the entire function
     end_time = time.time()
     print(f"Total conversion time: {end_time - start_time} seconds")
-    return io.BytesIO(b"msch\x01" + zlib.compress(buffer.getvalue()))
+    return io.BytesIO(b"msch\x01" + zlib.compress(buffer))
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
