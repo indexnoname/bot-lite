@@ -109,9 +109,9 @@ def resize_image(image, scale, resample_method):
 
 def convert_image_to_scheme(image, name):
     # Start timer for the entire function
-    start_time = time.time()
+    start_time = time.time().perf_counter
     # Timer for color conversion
-    color_conversion_start = time.time()
+    color_conversion_start = time.time().perf_counter
     # Convert image to 22 colors
     pixels = np.array(image, dtype=np.float32)
     color_array = np.array(list(COLORS.values()), dtype=np.float32)
@@ -126,10 +126,10 @@ def convert_image_to_scheme(image, name):
     # Reshape the result back to the original image shape
     new_pixels = nearest_colors.reshape(height, width, 3).astype(np.uint8)
     # End timer for color conversion
-    color_conversion_end = time.time()
+    color_conversion_end = time.time().perf_counter
     print(f"Color conversion time: {color_conversion_end - color_conversion_start} seconds")
     # Timer for schematic creation
-    schematic_creation_start = time.time()
+    schematic_creation_start = time.time().perf_counter
     # Precompute configurations
     config_map = {tuple(v): k for k, v in COLORS.items()}
 
@@ -141,10 +141,10 @@ def convert_image_to_scheme(image, name):
         for x in range(width): 
             buffer.write(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
     # End timer for schematic creation
-    schematic_creation_end = time.time()
+    schematic_creation_end = time.time().perf_counter
     print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
     # End timer for the entire function
-    end_time = time.time()
+    end_time = time.time().perf_counter
     print(f"Total conversion time: {end_time - start_time} seconds")
     return io.BytesIO(b"msch\x01" + zlib.compress(buffer.getvalue()))
 
