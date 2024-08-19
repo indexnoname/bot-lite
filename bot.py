@@ -82,8 +82,6 @@ def resize_image(image, scale, resample_method):
 def convert_image_to_scheme(image, name):
     # Start timer for the entire function
     start_time = time.perf_counter()
-    # Timer for color conversion
-    color_conversion_start = time.perf_counter()
     # Convert image to 22 colors
     pixels = np.array(image, dtype=np.float32)
     color_array = np.array(list(COLORS.values()), dtype=np.float32)
@@ -99,9 +97,7 @@ def convert_image_to_scheme(image, name):
     new_pixels = nearest_colors.reshape(height, width, 3).astype(np.uint8)
     # End timer for color conversion
     color_conversion_end = time.perf_counter()
-    print(f"Color conversion time: {color_conversion_end - color_conversion_start} seconds")
-    # Timer for schematic creation
-    schematic_creation_start = time.perf_counter()
+
     # Precompute configurations
     config_map = {tuple(v): k for k, v in COLORS.items()}
 
@@ -112,12 +108,9 @@ def convert_image_to_scheme(image, name):
     for y in range(height):
         for x in range(width): 
             buffer.write(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
-    # End timer for schematic creation
-    schematic_creation_end = time.perf_counter()
-    print(f"Schematic creation time: {schematic_creation_end - schematic_creation_start} seconds")
     # End timer for the entire function
     end_time = time.perf_counter()
-    print(f"Total conversion time: {end_time - start_time} seconds")
+    print(f"Color conversion time: {color_conversion_end - start_time} seconds\nSchematic creation time: {end_time - color_conversion_end} seconds\nTotal conversion time: {end_time - start_time} seconds")
     return io.BytesIO(b"msch\x01" + zlib.compress(buffer.getvalue()))
 
 @bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
@@ -145,6 +138,67 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
     # Trigger garbage collection
     gc.collect()
-# Run the bot with your token
+
+@bot.command(name='publish', brief='пихни файл после !publish или (ctrl C) если схема из буфера обмена')
+async def convert_scheme(ctx, *, base64_scheme: str = None):
+    if base64_scheme:
+        # Save the scheme to a file
+        with open('scheme.txt', 'w') as f:
+            f.write(base64_scheme)
+            decoded_bytes = base64.b64decode(base64_scheme)
+            # Write the encoded bytes to a .msch file
+            with open('scheme.msch', 'wb') as f:
+                f.write(decoded_bytes)
+    elif ctx.message.attachments:
+        attachment = ctx.message.attachments[0]
+        if attachment.filename.endswith('.msch'):
+            await attachment.save('scheme.msch')
+            # Read the .msch file and convert it to base64
+            with open('scheme.msch', 'rb') as f:
+                encoded_string = base64.b64encode(f.read()).decode('utf-8')
+            with open('scheme.txt', 'w') as f:
+                f.write(encoded_string)
+        elif attachment.filename.endswith('.txt'):
+            await attachment.save('scheme.txt')
+            # Read the .txt file and encode it to base64
+            with open('scheme.txt', 'rb') as f:
+                decoded_bytes = base64.b64decode(f.read())
+            # Write the encoded bytes to a .msch file
+            with open('scheme.msch', 'wb') as f:
+                f.write(decoded_bytes)
+        else:
+            await ctx.send('Please provide a valid .msch file.')
+            return
+    else:
+        await ctx.send('Please provide a base64 scheme or attach a .msch file.')
+        return
+
+    # Run the Node.js script to convert the scheme to an image and get info
+    result = subprocess.run(['node', 'schemecompiler.js'], capture_output=True, text=True)
+    
+    if result.returncode != 0:
+        await ctx.send('There was an error processing the scheme.')
+        return
+    
+    # Read the schematic info from the JSON file
+    with open('/home/nonamecoding/Desktop/bots/json/scheme_info.json', 'r') as f:
+        schematic_info = json.load(f)
+    
+    # Format the schematic info for the message
+    schematic_info_message = (
+        f"**Название:** {schematic_info['name']}\n"
+        f"**Описание:** {schematic_info['description']}\n"
+    )
+
+    # Send the generated image and schematic info back to the specified channel
+    channel = bot.get_channel(info['SCHEME_CHANNEL_ID'])
+    if channel:
+        files = [discord.File('scheme.png')]
+        if os.path.isfile('scheme.msch'):
+            files.append(discord.File('scheme.msch', filename='scheme.msch'))
+        await channel.send(content=schematic_info_message, files=files)
+    else:
+        await ctx.send('Failed to send the image to the specified channel.')
+
 
 bot.run(config['token'])
