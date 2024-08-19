@@ -164,7 +164,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
     with Image.open(imageio).convert('RGB') as image:
         image = resize_image(image, scale, resample_method.upper())
-        image = convert_image_to_scheme(resized_image, ctx.message.attachments[0].filename)
+        image = convert_image_to_scheme(image, ctx.message.attachments[0].filename)
         
         await ctx.send(file=discord.File(fp=image, filename="scheme.msch"))
 
