@@ -5,9 +5,9 @@ import discord, subprocess, json, os, struct, zlib, base64, time, math, io, gc
 
 
 # Load configuration from JSON file
-with open('/json/config.json', 'r') as config_file:
+with open('config.json', 'r') as config_file:
     config = json.load(config_file)
-with open('/json/colors.json', 'r') as colors_file:
+with open('json/colors.json', 'r') as colors_file:
     COLORS = {int(k): tuple(v) for k, v in json.load(colors_file).items()}
 
 # Initialize the bot with a command prefix
