@@ -160,15 +160,18 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
     if not ctx.message.attachments: return await ctx.send('Please attach an image.')
 
-    with Image.open(await ctx.message.attachments[0].read()).convert('RGB') as image:
+    imageio = io.BytesIO(await ctx.message.attachments[0].read())
+
+    with Image.open(imageio).convert('RGB') as image:
         resized_image, new_width, new_height = resize_image(image, scale, resample_method.upper())
         scheme_file = convert_image_to_scheme(resized_image, ctx.message.attachments[0].filename)
         
         await ctx.send(file=discord.File(fp=scheme_file, filename="scheme.msch"))
 
     # Manually delete variables to free memory
-    del image_data, image, resized_image, scheme_file
+    del imageio, image, resized_image, scheme_file
 
+    # Trigger garbage collection
     gc.collect()
 # Run the bot with your token
 
