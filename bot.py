@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 from discord.ext import commands
-import discord, subprocess, json, os, struct, zlib, base64, time, math, io
+import discord, subprocess, json, os, struct, zlib, base64, time, math, io, gc
 
 
 # Load configuration from JSON file
@@ -168,6 +168,8 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 
     # Manually delete variables to free memory
     del image_data, image, resized_image, scheme_file
+
+    gc.collect()
 # Run the bot with your token
 
 bot.run(config['token'])
