@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Function to execute a shell command and return the output
 def execute(command):
-    return subprocess.run(command, capture_output=True, text=True).stdout
+    return subprocess.run(command.split(), capture_output=True, text=True).stdout
 
 # Function to get the list of models from ollama list
 def get_model_list():
