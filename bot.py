@@ -41,12 +41,7 @@ async def ailist(ctx):
 # Command to run a specific model in Ollama
 @bot.command(name='airun')
 async def airun(ctx, model: str, *, prompt: str):
-    # Check if the model exists
-    if model not in get_model_list():
-        await ctx.send(f"Model '{model}' not found in Ollama.")
-        return
-
-    # Run the model
+    if model not in get_model_list(): return await ctx.send(f"Model '{model}' not found in Ollama.")
     await ctx.send(f"Running model '{model}'...")
     await ctx.send(execute(f'ollama run {model} {prompt}]'))
 
