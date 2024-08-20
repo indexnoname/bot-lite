@@ -40,15 +40,15 @@ async def ailist(ctx):
 
 # Command to run a specific model in Ollama
 @bot.command(name='airun')
-async def airun(ctx, model: str, *, prompt: str):
+async def airun(ctx, model: str, *, prompt: str = "write a short answer that user did not prompted anything to you"):
     if model not in get_model_list(): return await ctx.send(f"Model '{model}' not found in Ollama.")
     await ctx.send(f"Running model '{model}'...")
     await ctx.send(execute(f'ollama run {model} {prompt}]'))
 
-def resmet(method = str):
+def resmet(method: str = ""): 
     return getattr(Image, method.upper())
 
-def txtbin(txt = str):
+def txtbin(txt: str = ""):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
     
 def majority_color_resize(image, scale, target_width, target_height, original_width, original_height):
