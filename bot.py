@@ -105,22 +105,33 @@ def convert_image_to_scheme(image, name):
     buffer = io.BytesIO()
     buffer.write(struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("this scheme created by bot-lite check git indexnoname") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width))
 
-    data = []
+record_size = 1 + 2 + 2 + 1 + 1 + 2 + 1  # Size of each packed record in bytes
+total_size = width * height * record_size
+
+# Preallocate a bytearray of the required size
+data = bytearray(total_size)
+
+# Index to keep track of where to write in the bytearray
+index = 0
 
     for y in range(height):
         for x in range(width):
-            data.append(
-                struct.pack(
-                    ">bHHbbHb", 
-                    0, 
-                    x, 
-                    height - y - 1, 
-                    5, 
-                    0, 
-                    config_map[tuple(new_pixels[y, x])], 
-                    0
-                )
+            struct.pack_into(
+                ">bHHbbHb", 
+                data, 
+                index, 
+                0, 
+                x, 
+                height - y - 1, 
+                5, 
+                0, 
+                config_map[tuple(new_pixels[y, x])], 
+                0
             )
+            index += record_size  # Move to the next position in the bytearray
+
+# Write the bytearray to the buffer in a single call
+buffer.write(data)
 
     # Combine all data into a single bytes object
     buffer.write(b''.join(data))
