@@ -105,9 +105,25 @@ def convert_image_to_scheme(image, name):
     buffer = io.BytesIO()
     buffer.write(struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("this scheme created by bot-lite check git indexnoname") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width))
 
+    data = []
+
     for y in range(height):
-        for x in range(width): 
-            buffer.write(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
+        for x in range(width):
+            data.append(
+                struct.pack(
+                    ">bHHbbHb", 
+                    0, 
+                    x, 
+                    height - y - 1, 
+                    5, 
+                    0, 
+                    config_map[tuple(new_pixels[y, x])], 
+                    0
+                )
+            )
+
+    # Combine all data into a single bytes object
+    buffer.write(b''.join(data))
     # End timer for the entire function
     end_time = time.perf_counter()
     print(f"Color conversion time: {color_conversion_end - start_time} seconds\nSchematic creation time: {end_time - color_conversion_end} seconds\nTotal conversion time: {end_time - start_time} seconds")
