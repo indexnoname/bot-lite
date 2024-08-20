@@ -130,8 +130,8 @@ def convert_image_to_scheme(image, name):
             )
             index += record_size  # Move to the next position in the bytearray
 
-# Write the bytearray to the buffer in a single call
-buffer.write(data)
+    # Write the bytearray to the buffer in a single call
+    buffer.write(data)
 
     # Combine all data into a single bytes object
     buffer.write(b''.join(data))
