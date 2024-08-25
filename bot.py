@@ -66,13 +66,12 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
             x_start = int(x * x_scale)
             x_end = int((x + 1) * x_scale)
 
-            # Extract the block and find the majority color using bincount
+            # Extract the block and find the majority color using numpy's bincount
             block_pixels = pixels[y_start:y_end, x_start:x_end].reshape(-1, 3)
-            flat_pixels = block_pixels.view(np.uint32).reshape(-1)
-            majority_color = np.bincount(flat_pixels).argmax()
-            majority_color_rgb = tuple((majority_color >> (8 * i)) & 0xFF for i in range(3))
+            colors, counts = np.unique(block_pixels, axis=0, return_counts=True)
+            majority_color = colors[np.argmax(counts)]
 
-            resized_image.putpixel((x, y), majority_color_rgb)
+            resized_image.putpixel((x, y), tuple(majority_color))
 
     return resized_image
 def resize_image(image, scale, resample_method):
