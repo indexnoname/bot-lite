@@ -63,11 +63,11 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
 
     for y in range(target_height):
         y_start = int(y * y_scale)
-        y_end = int((y + 1) * y_scale)
+        y_end = int(y_start + y_scale)
 
         for x in range(target_width):
             x_start = int(x * x_scale)
-            x_end = int((x + 1) * x_scale)
+            x_end = int(x_start + x_scale)
 
             # Extract the block and flatten it
             block_pixels = pixels[y_start:y_end, x_start:x_end].reshape(-1, 3)
