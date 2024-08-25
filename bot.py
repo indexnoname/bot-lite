@@ -92,8 +92,7 @@ def resize_image(image, scale, resample_method):
     scale = min(scale / 100, 256 / original_width, 256 / original_height)
     target_width, target_height = int(original_width * scale), int(original_height * scale)
 
-    if resample_method == 'MAJORITY':
-        return majority_color_resize(image, scale, target_width, target_height, original_width, original_height)
+    if resample_method == 'MAJORITY': return majority_color_resize(image, scale, target_width, target_height, original_width, original_height)
     return image.resize((target_width, target_height), resmet(resample_method))
 
 def convert_image_to_scheme(image, name):
@@ -120,7 +119,11 @@ def convert_image_to_scheme(image, name):
 
     # Create the schematic
     buffer = io.BytesIO()
-    buffer.write(struct.pack(">HHb", width, height, 2)+txtbin("name")+txtbin(name)+txtbin("description")+txtbin("this scheme created by bot-lite check git indexnoname") + struct.pack(">b", 1,)+txtbin('sorter')+struct.pack(">i", height*width))
+    buffer.write(struct.pack(">HHb", width, height, 2)
+    +txtbin("name")+txtbin(name)
+    +txtbin("description")+txtbin("this scheme created by bot-lite check git indexnoname")
+    +struct.pack(">b", 1,)+txtbin('sorter')
+    +struct.pack(">i", height*width))
 
     for y in range(height):
         for x in range(width):
@@ -131,7 +134,7 @@ def convert_image_to_scheme(image, name):
     print(f"Color conversion time: {color_conversion_end - start_time} seconds\nSchematic creation time: {end_time - color_conversion_end} seconds\nTotal conversion time: {end_time - start_time} seconds")
     return io.BytesIO(b"msch\x01" + zlib.compress(buffer.getvalue()))
 
-@bot.command(name='convertimage', brief='Кинь картинку напиши насколько изменить в процентах и вибери метод создания картинки например !convertimage 75 mix')
+@bot.command(name='convertimage', brief='!convertimage int majority/box/lanczos/mix/else')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     """
     Converts an attached image to a Mindustry schematic.
@@ -168,7 +171,7 @@ async def convert_scheme(ctx, *, scheme: str = None):
 
             with open('scheme.msch', 'wb') as f:
                 f.write(base64.b64decode(f.read()))
-                
+
         else: return await ctx.send('Please provide a valid .msch file.')
 
     else: return await ctx.send('Please provide a base64 scheme or attach a .msch file.')
@@ -194,8 +197,6 @@ async def convert_scheme(ctx, *, scheme: str = None):
         files = [discord.File('scheme.png')]
         if os.path.isfile('scheme.msch'): files.append(discord.File('scheme.msch', filename='scheme.msch'))
         await channel.send(content=schematic_info_message, files=files)
-    else:
-        await ctx.send('Failed to send the image to the specified channel.')
-
+    else: await ctx.send('Failed to send the image to the specified channel.')
 
 bot.run(config['token'])
