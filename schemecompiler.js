@@ -6,8 +6,9 @@ fs.readFile('scheme.msch', 'utf8', (err, base64) => {
         console.error('Error reading scheme:', err);
         process.exit(1);
     }
+    const buffer = Buffer.from(base64, 'base64')
     try {
-        const schematic = Schematic.decode(base64);
+        const schematic = Schematic.decode(buffer);
 
         // Save schematic info to a JSON file
         const schematicInfo = {
