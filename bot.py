@@ -155,12 +155,12 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     gc.collect()
 
 @bot.command(name='publish', brief='пихни файл после !publish или (ctrl C) если схема из буфера обмена')
-async def convert_scheme(ctx, *, base64_scheme: str = None):
-    if base64_scheme:
+async def convert_scheme(ctx, *, scheme: str = None):
+    if scheme:
         # Save the scheme to a file
         with open('scheme.txt', 'w') as f:
-            f.write(base64_scheme)
-            decoded_bytes = base64.b64decode(base64_scheme)
+            f.write(scheme)
+            decoded_bytes = base64.b64decode(scheme)
             # Write the encoded bytes to a .msch file
             with open('scheme.msch', 'wb') as f:
                 f.write(decoded_bytes)
@@ -206,7 +206,7 @@ async def convert_scheme(ctx, *, base64_scheme: str = None):
     )
 
     # Send the generated image and schematic info back to the specified channel
-    channel = bot.get_channel(config['SCHEME_CHANNEL_ID'])
+    channel = bot.get_channel(config['scheme_channel_id'])
     if channel:
         files = [discord.File('scheme.png')]
         if os.path.isfile('scheme.msch'):

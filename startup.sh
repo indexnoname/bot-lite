@@ -27,5 +27,10 @@ for pkg in "${!REQUIRED_PACKAGES[@]}"; do
     fi
 done
 
+if ! command -v node &> /dev/null; then
+    sudo apt install -y nodejs npm
+    npm install mindustry-schematic-parser
+fi
+
 # run the bot script
 python3 bot.py
