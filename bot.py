@@ -69,23 +69,17 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
             x_start = int(x * x_scale)
             x_end = int((x + 1) * x_scale)
 
-            # Extract the block and find the majority color using numpy's bincount
+            # Extract the block and flatten it
             block_pixels = pixels[y_start:y_end, x_start:x_end].reshape(-1, 3)
             if block_pixels.size == 0:
                 continue  # skip empty blocks
 
-            # Convert RGB tuples to a single integer for counting
-            flat_pixels = block_pixels.dot(np.array([1, 256, 65536], dtype=np.int32))
-            majority_color_int = np.bincount(flat_pixels).argmax()
+            # Use a tuple as a hashable object for counting unique colors
+            unique_colors, counts = np.unique(block_pixels, axis=0, return_counts=True)
+            majority_color = unique_colors[np.argmax(counts)]
 
-            # Convert the integer back to an RGB tuple
-            majority_color_rgb = (
-                majority_color_int & 255,
-                (majority_color_int >> 8) & 255,
-                (majority_color_int >> 16) & 255
-            )
-
-            resized_image[y, x] = majority_color_rgb
+            # Assign the majority color to the resized image
+            resized_image[y, x] = majority_color
 
     end_time = time.perf_counter()
     print(f"Color majority resize time: {end_time - start_time} seconds")
