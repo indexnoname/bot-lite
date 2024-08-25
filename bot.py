@@ -96,7 +96,6 @@ def resize_image(image, scale, resample_method):
     return image.resize((target_width, target_height), resmet(resample_method))
 
 def convert_image_to_scheme(image, name):
-    # Start timer for the entire function
     start_time = time.perf_counter()
     # Convert image to 22 colors
     pixels = np.array(image, dtype=np.float32)
@@ -111,25 +110,22 @@ def convert_image_to_scheme(image, name):
     
     # Reshape the result back to the original image shape
     new_pixels = nearest_colors.reshape(height, width, 3).astype(np.uint8)
-    # End timer for color conversion
+
     color_conversion_end = time.perf_counter()
 
-    # Precompute configurations
     config_map = {tuple(v): k for k, v in COLORS.items()}
 
-    # Create the schematic
+
     buffer = io.BytesIO()
     buffer.write(struct.pack(">HHb", width, height, 2)
     +txtbin("name")+txtbin(name)
     +txtbin("description")+txtbin("this scheme created by bot-lite check git indexnoname")
     +struct.pack(">b", 1,)+txtbin('sorter')
     +struct.pack(">i", height*width))
-
     for y in range(height):
         for x in range(width):
             buffer.write(struct.pack(">bHHbbHb", 0, x, height - y - 1, 5, 0, config_map[tuple(new_pixels[y, x])], 0))
 
-    # End timer for the entire function
     end_time = time.perf_counter()
     print(f"Color conversion time: {color_conversion_end - start_time} seconds\nSchematic creation time: {end_time - color_conversion_end} seconds\nTotal conversion time: {end_time - start_time} seconds")
     return io.BytesIO(b"msch\x01" + zlib.compress(buffer.getvalue()))
@@ -157,7 +153,7 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     del imageio, image
     gc.collect()
 
-@bot.command(name='publish', brief='пихни файл после !publish или (ctrl C) если схема из буфера обмена')
+@bot.command(name='publish', brief='!publish after attach file or ctrl-c from clipboard')
 async def convert_scheme(ctx, *, scheme: str = None):
     if scheme:
             with open('scheme.msch', 'wb') as f:
