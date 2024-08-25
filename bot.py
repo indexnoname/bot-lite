@@ -74,7 +74,7 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
 
             resized_image.putpixel((x, y), tuple(majority_color))
     end_time = time.perf_counter()
-    print(f"Color conversion time: {end_time - start_time} seconds")
+    print(f"Color majority resize time: {end_time - start_time} seconds")
     return resized_image
 def resize_image(image, scale, resample_method):
     original_width, original_height = image.size
