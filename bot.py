@@ -75,11 +75,10 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
                 continue  # skip empty blocks
 
             # Use a tuple as a hashable object for counting unique colors
-            unique_colors, counts = np.unique(block_pixels, axis=0, return_counts=True)
-            majority_color = unique_colors[np.argmax(counts)]
+            unique_colors, counts = np.unique(block_pixels, axis=0, return_counts=True) 
 
             # Assign the majority color to the resized image
-            resized_image[y, x] = majority_color
+            resized_image[y, x] = unique_colors[np.argmax(counts)]
 
     end_time = time.perf_counter()
     print(f"Color majority resize time: {end_time - start_time} seconds")
