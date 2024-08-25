@@ -51,41 +51,32 @@ def resmet(method: str = ""):
 def txtbin(txt: str = ""):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
     
+import numpy as np
+from scipy.ndimage import zoom
+from skimage.measure import block_reduce
+from collections import Counter
+
+def majority_color(block):
+    block = block.reshape(-1, 3)
+    most_common = Counter(map(tuple, block)).most_common(1)[0][0]
+    return np.array(most_common, dtype=np.uint8)
+
 def majority_color_resize(image, scale, target_width, target_height, original_width, original_height):
     start_time = time.perf_counter()
 
     pixels = np.array(image)
-    resized_image = np.zeros((target_height, target_width, 3), dtype=np.uint8)
 
-    # Calculate the scaling ratios
-    y_scale = original_height / target_height
-    x_scale = original_width / target_width
+    # Calculate block size for reduction
+    block_size = (int(original_height / target_height), int(original_width / target_width), 1)
 
-    for y in range(target_height):
-        y_start = int(y * y_scale)
-        y_end = int((y + 1) * y_scale)
-
-        for x in range(target_width):
-            x_start = int(x * x_scale)
-            x_end = int((x + 1) * x_scale)
-
-            # Extract the block and flatten it
-            block_pixels = pixels[y_start:y_end, x_start:x_end].reshape(-1, 3)
-            if block_pixels.size == 0:
-                continue  # skip empty blocks
-
-            # Use a tuple as a hashable object for counting unique colors
-            unique_colors, counts = np.unique(block_pixels, axis=0, return_counts=True)
-            majority_color = unique_colors[np.argmax(counts)]
-
-            # Assign the majority color to the resized image
-            resized_image[y, x] = majority_color
+    # Use block_reduce to apply the majority_color function
+    reduced_image = block_reduce(pixels, block_size=block_size, func=majority_color)
 
     end_time = time.perf_counter()
     print(f"Color majority resize time: {end_time - start_time} seconds")
 
     # Convert back to PIL Image
-    return Image.fromarray(resized_image, 'RGB')
+    return Image.fromarray(reduced_image, 'RGB')
 def resize_image(image, scale, resample_method):
     original_width, original_height = image.size
 
