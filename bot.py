@@ -71,8 +71,7 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
 
             # Extract the block and flatten it
             block_pixels = pixels[y_start:y_end, x_start:x_end].reshape(-1, 3)
-            if block_pixels.size == 0:
-                continue  # skip empty blocks
+
 
             # Use a tuple as a hashable object for counting unique colors
             unique_colors, counts = np.unique(block_pixels, axis=0, return_counts=True)
