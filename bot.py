@@ -157,43 +157,26 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 @bot.command(name='publish', brief='пихни файл после !publish или (ctrl C) если схема из буфера обмена')
 async def convert_scheme(ctx, *, scheme: str = None):
     if scheme:
-        # Save the scheme to a file
-        with open('scheme.txt', 'w') as f:
-            f.write(scheme)
-            decoded_bytes = base64.b64decode(scheme)
-            # Write the encoded bytes to a .msch file
             with open('scheme.msch', 'wb') as f:
-                f.write(decoded_bytes)
+                f.write(base64.b64decode(scheme))
     elif ctx.message.attachments:
         attachment = ctx.message.attachments[0]
         if attachment.filename.endswith('.msch'):
             await attachment.save('scheme.msch')
-            # Read the .msch file and convert it to base64
-            with open('scheme.msch', 'rb') as f:
-                encoded_string = base64.b64encode(f.read()).decode('utf-8')
-            with open('scheme.txt', 'w') as f:
-                f.write(encoded_string)
         elif attachment.filename.endswith('.txt'):
             await attachment.save('scheme.txt')
-            # Read the .txt file and encode it to base64
-            with open('scheme.txt', 'rb') as f:
-                decoded_bytes = base64.b64decode(f.read())
-            # Write the encoded bytes to a .msch file
+
             with open('scheme.msch', 'wb') as f:
-                f.write(decoded_bytes)
-        else:
-            await ctx.send('Please provide a valid .msch file.')
-            return
-    else:
-        await ctx.send('Please provide a base64 scheme or attach a .msch file.')
-        return
+                f.write(base64.b64decode(f.read()))
+                
+        else: return await ctx.send('Please provide a valid .msch file.')
+
+    else: return await ctx.send('Please provide a base64 scheme or attach a .msch file.')
 
     # Run the Node.js script to convert the scheme to an image and get info
     result = execute("node schemecompiler.js")
     
-    if result.returncode != 0:
-        await ctx.send('There was an error processing the scheme.')
-        return
+    if result.returncode != 0: return await ctx.send('There was an error processing the scheme.')
     
     # Read the schematic info from the JSON file
     with open('/home/nonamecoding/Desktop/bots/json/scheme_info.json', 'r') as f:
@@ -209,8 +192,7 @@ async def convert_scheme(ctx, *, scheme: str = None):
     channel = bot.get_channel(config['scheme_channel_id'])
     if channel:
         files = [discord.File('scheme.png')]
-        if os.path.isfile('scheme.msch'):
-            files.append(discord.File('scheme.msch', filename='scheme.msch'))
+        if os.path.isfile('scheme.msch'): files.append(discord.File('scheme.msch', filename='scheme.msch'))
         await channel.send(content=schematic_info_message, files=files)
     else:
         await ctx.send('Failed to send the image to the specified channel.')

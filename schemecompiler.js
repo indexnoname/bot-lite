@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { Schematic } = require('mindustry-schematic-parser');
 
-fs.readFile('schemes/scheme.txt', 'utf8', (err, base64) => {
+fs.readFile('schemes/scheme.msch', 'utf8', (err, base64) => {
     if (err) {
         console.error('Error reading scheme:', err);
         process.exit(1);
