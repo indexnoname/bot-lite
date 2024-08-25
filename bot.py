@@ -75,12 +75,11 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
 
     return resized_image
 def resize_image(image, scale, resample_method):
-    
     original_width, original_height = image.size
 
     scale = min(scale / 100, 256 / original_width, 256 / original_height)
-    target_width, target_height = math.floor(original_width * scale), math.floor(original_height * scale)
-    
+    target_width, target_height = int(original_width * scale), int(original_height * scale)
+
     if resample_method == 'MAJORITY':
         return majority_color_resize(image, scale, target_width, target_height, original_width, original_height)
     return image.resize((target_width, target_height), resmet(resample_method))
