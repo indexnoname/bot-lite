@@ -52,20 +52,28 @@ def txtbin(txt: str = ""):
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
     
 def majority_color_resize(image, scale, target_width, target_height, original_width, original_height):
-
     resized_image = Image.new('RGB', (target_width, target_height))
     pixels = np.array(image)
+
+    # Calculate the scaling ratios
+    y_scale = original_height / target_height
+    x_scale = original_width / target_width
+
     for y in range(target_height):
+        y_start = int(y * y_scale)
+        y_end = int((y + 1) * y_scale)
         for x in range(target_width):
-            block_pixels = pixels[
-                math.floor(y * original_height / target_height): math.ceil((y + 1) * original_height / target_height),
-                math.floor(x * original_width / target_width): math.ceil((x + 1) * original_width / target_width)
-            ]
-            flat_pixels = block_pixels.reshape(-1, block_pixels.shape[-1])
-            unique, counts = np.unique(flat_pixels, axis=0, return_counts=True)
-            majority_color = unique[np.argmax(counts)]
-            resized_image.putpixel((x, y), tuple(majority_color))
-    
+            x_start = int(x * x_scale)
+            x_end = int((x + 1) * x_scale)
+
+            # Extract the block and find the majority color using bincount
+            block_pixels = pixels[y_start:y_end, x_start:x_end].reshape(-1, 3)
+            flat_pixels = block_pixels.view(np.uint32).reshape(-1)
+            majority_color = np.bincount(flat_pixels).argmax()
+            majority_color_rgb = tuple((majority_color >> (8 * i)) & 0xFF for i in range(3))
+
+            resized_image.putpixel((x, y), majority_color_rgb)
+
     return resized_image
 def resize_image(image, scale, resample_method):
     
