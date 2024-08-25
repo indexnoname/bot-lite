@@ -177,13 +177,12 @@ async def convert_scheme(ctx, *, scheme: str = None):
     if result != False: return await ctx.send('There was an error processing the scheme.')
     
     # Read the schematic info from the JSON file
-    with open('/home/nonamecoding/Desktop/bots/json/scheme_info.json', 'r') as f:
-        schematic_info = json.load(f)
-    
+    name = "test"
+    desc = "test2"
     # Format the schematic info for the message
     schematic_info_message = (
-        f"**Название:** {schematic_info['name']}\n"
-        f"**Описание:** {schematic_info['description']}\n"
+        f"**Название:** {name}\n"
+        f"**Описание:** {desc}\n"
     )
 
     # Send the generated image and schematic info back to the specified channel
