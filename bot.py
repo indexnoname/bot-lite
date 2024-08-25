@@ -4,43 +4,43 @@ from discord.ext import commands
 import discord, subprocess, json, os, struct, zlib, base64, time, math, io, gc
 
 
-# Load configuration from JSON file
+
 with open('json/config.json', 'r') as config_file:
     config = json.load(config_file)
 with open('json/colors.json', 'r') as colors_file:
     COLORS = {int(k): tuple(v) for k, v in json.load(colors_file).items()}
 
-# Initialize the bot with a command prefix
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Function to execute a shell command and return the output
-def execute(command):
+
+def execute(command: str = "echo 'nothing inputed'"):
+    """cmd execution just input full string"""
     return subprocess.run(command.split(), capture_output=True, text=True).stdout
 
-# Function to get the list of models from ollama list
 def get_model_list():
+    """ollama list output from console maybe replace by python"""
     return [line.split()[0] for line in execute('ollama list').splitlines()[1:]]
 
 @bot.event
 async def on_ready():
-    print(f'Bot is ready. Logged in as {bot.user}')
+    print(f'Bot is ready. Logged in as {bot.user}') #remove?
 
 @bot.event
 async def on_member_join(member):
+    """welcome msg when player joined"""
     channel = bot.get_channel(config['welcome_channel_id'])
-    if channel:
-        await channel.send(f'Hello {member.mention}! Welcome to the server!')
+    if channel: await channel.send(f'Hello {member.mention}! Welcome to the server!')
 
-# Command to list all AI models in Ollama
 @bot.command(name='ailist')
 async def ailist(ctx):
+    """returns installed llms list"""
     await ctx.send(f"Available models:\n```\n{execute('ollama list')}\n```")
 
-# Command to run a specific model in Ollama
 @bot.command(name='airun')
-async def airun(ctx, model: str, *, prompt: str = "you've been prompted without any messege please type back that user forgot to type message"):
+async def airun(ctx, model: str = "iforgortoinput", *, prompt: str = "you've been prompted without any messege please type back that user forgot to type message"):
+    """runs ollama llm needs upgrade"""
     if model not in get_model_list(): return await ctx.send(f"Model '{model}' not found in Ollama.")
     await ctx.send(f"Running model '{model}'...")
     await ctx.send(execute(f'ollama run {model} {prompt}]'))
@@ -72,9 +72,8 @@ def resize_image(image, scale, resample_method):
     original_width, original_height = image.size
 
     scale = min(scale / 100, 256 / original_width, 256 / original_height)
-    target_width = math.floor(original_width * scale)
-    target_height = math.floor(original_height * scale)
-
+    target_width, target_height = math.floor(original_width * scale), math.floor(original_height * scale)
+    
     if resample_method == 'MAJORITY':
         return majority_color_resize(image, scale, target_width, target_height, original_width, original_height)
     return image.resize((target_width, target_height), resmet(resample_method))
@@ -175,7 +174,7 @@ async def convert_scheme(ctx, *, base64_scheme: str = None):
         return
 
     # Run the Node.js script to convert the scheme to an image and get info
-    result = subprocess.run(['node', 'schemecompiler.js'], capture_output=True, text=True)
+    result = execute("node schemecompiler.js")
     
     if result.returncode != 0:
         await ctx.send('There was an error processing the scheme.')
@@ -192,7 +191,7 @@ async def convert_scheme(ctx, *, base64_scheme: str = None):
     )
 
     # Send the generated image and schematic info back to the specified channel
-    channel = bot.get_channel(info['SCHEME_CHANNEL_ID'])
+    channel = bot.get_channel(config['SCHEME_CHANNEL_ID'])
     if channel:
         files = [discord.File('scheme.png')]
         if os.path.isfile('scheme.msch'):
