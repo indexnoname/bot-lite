@@ -6,7 +6,7 @@ fs.readFile('scheme.msch', 'utf8', (err, base64) => {
         console.error('Error reading scheme:', err);
         process.exit(1);
     }
-
+    console.log(Buffer.from(base64).toString('base64'))
     try {
         const schematic = Schematic.decode(Buffer.from(base64).toString('base64'));
 
