@@ -1,6 +1,7 @@
-from PIL import Image
 import numpy as np
 from discord.ext import commands
+from PIL import Image
+from collections import defaultdict
 import discord, subprocess, json, os, struct, zlib, base64, time, math, io, gc
 
 
@@ -74,9 +75,13 @@ def majority_color_resize(image, scale, target_width, target_height, original_wi
             if block_pixels.size == 0:
                 continue  # skip empty blocks
 
-            # Use a tuple as a hashable object for counting unique colors
-            unique_colors, counts = np.unique(block_pixels, axis=0, return_counts=True)
-            majority_color = unique_colors[np.argmax(counts)]
+            # Use a dictionary to count occurrences of each color
+            color_count = defaultdict(int)
+            for color in map(tuple, block_pixels):
+                color_count[color] += 1
+
+            # Find the majority color
+            majority_color = max(color_count.items(), key=lambda item: item[1])[0]
 
             # Assign the majority color to the resized image
             resized_image[y, x] = majority_color
