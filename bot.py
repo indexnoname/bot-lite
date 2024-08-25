@@ -163,10 +163,9 @@ async def convert_scheme(ctx, *, scheme: str = None):
         if attachment.filename.endswith('.msch'):
             await attachment.save('scheme.msch')
         elif attachment.filename.endswith('.txt'):
-            await attachment.save('scheme.txt')
-
+            scheme = io.BytesIO(await ctx.message.attachments[0].read())
             with open('scheme.msch', 'wb') as f:
-                f.write(base64.b64decode(f.read()))
+                f.write(base64.b64decode(scheme))
 
         else: return await ctx.send('Please provide a valid .msch file.')
 
