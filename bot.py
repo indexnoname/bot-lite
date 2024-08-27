@@ -46,9 +46,11 @@ async def airun(ctx, model: str = "iforgortoinput", *, prompt: str = "you've bee
     await ctx.send(execute(f'ollama run {model} {prompt}]'))
 
 def resmet(method: str = ""): 
-    return getattr(Image, method.upper())
+    """returns image method number when inputed the text"""
+    return getattr(Image, method.upper()) #remove?
 
 def txtbin(txt: str = ""):
+    """text converter for mindustry basically just len of text + text in utf encoding"""
     return struct.pack(">H", len(txt))+txt.encode("UTF-8")
     
 def majority_color_resize(image, scale, target_width, target_height, original_width, original_height):
@@ -133,11 +135,11 @@ def convert_image_to_scheme(image, name):
 @bot.command(name='convertimage', brief='!convertimage int majority/box/lanczos/mix/else')
 async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
     """
-    Converts an attached image to a Mindustry schematic.
+    Converts attached image to mindustry schematic in sorters
     
     Parameters:
-    scale (int): The scale to resize the image. Default is 100 (no resizing).
-    resample_method (str): The resampling method to use is from image (PIL) + majority. Default is 'LANCZOS'.
+    scale (int): The scale to resize the image. Default is 100 (no resizing). if it is scaled bigger than 256 blocks it will make 256 blocks
+    resample_method (str): The resampling method (majority box lanczos) default is lanczos
     """
 
     if not ctx.message.attachments: return await ctx.send('Please attach an image.')
@@ -156,8 +158,8 @@ async def convert(ctx, scale: int = 100, resample_method: str = 'LANCZOS'):
 @bot.command(name='publish', brief='!publish after attach file or ctrl-c from clipboard')
 async def convert_scheme(ctx, *, scheme: str = None):
     if scheme:
-            with open('scheme.msch', 'wb') as f:
-                f.write(base64.b64decode(scheme))
+        with open('scheme.msch', 'wb') as f:
+            f.write(base64.b64decode(scheme))
     elif ctx.message.attachments:
         attachment = ctx.message.attachments[0]
         if attachment.filename.endswith('.msch'):
