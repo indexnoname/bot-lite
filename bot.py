@@ -176,7 +176,7 @@ async def convert_scheme(ctx, *, scheme: str = None):
     # Run the Node.js script to convert the scheme to an image and get info
     result = execute("node schemecompiler.js")
     
-    if result == False: return await ctx.send('There was an error processing the scheme.')
+    #if result == False: return await ctx.send('There was an error processing the scheme.')
     
     # Read the schematic info from the JSON file
     name = "test"
