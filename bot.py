@@ -181,8 +181,8 @@ async def convert_scheme(ctx, *, scheme: str = None):
     SchematicInfo = json.loads(SchematicInfo)
     # Format the schematic info for the message
     schematic_info_message = (
-        f"**Название:** {data.get('name')}\n"
-        f"**Описание:** {data.get('description')}\n"
+        f"**Название:** {SchematicInfo.get('name')}\n"
+        f"**Описание:** {SchematicInfo.get('description')}\n"
     )
 
     # Send the generated image and schematic info back to the specified channel
