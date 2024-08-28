@@ -178,7 +178,7 @@ async def convert_scheme(ctx, *, scheme: str = None):
     
     if SchematicInfo == False: return await ctx.send('There was an error processing the scheme.')
     
-    SchematicInfo = json.loads(SchematicInfo.stdout)
+    SchematicInfo = json.loads(SchematicInfo)
     # Format the schematic info for the message
     schematic_info_message = (
         f"**Название:** {data.get('name')}\n"
