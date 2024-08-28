@@ -10,11 +10,7 @@ fs.readFile('scheme.msch', (err, base64) => {
     try {
         const schematic = Schematic.decode(buffer);
 
-        // Save schematic info to a JSON file
-        const schematicInfo = {
-            name: schematic.name,
-            description: schematic.description,
-        };
+        console.log(scheme.name, " ",schematic.description )
 
         schematic
             .render({
