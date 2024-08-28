@@ -10,7 +10,7 @@ fs.readFile('scheme.msch', (err, base64) => {
     try {
         const schematic = Schematic.decode(buffer);
 
-        console.log(scheme.name, " ",schematic.description )
+        console.log(schematic.name, " ",schematic.description )
 
         schematic
             .render({
