@@ -174,17 +174,15 @@ async def convert_scheme(ctx, *, scheme: str = None):
     else: return await ctx.send('Please provide a base64 scheme or attach a .msch file.')
 
     # Run the Node.js script to convert the scheme to an image and get info
-    result = execute("node schemecompiler.js")
+    SchematicInfo = execute("node schemecompiler.js")
     
     if result == False: return await ctx.send('There was an error processing the scheme.')
     
-    # Read the schematic info from the JSON file
-    name = "test"
-    desc = "test2"
+    SchematicInfo = json.loads(SchematicInfo.stdout)
     # Format the schematic info for the message
     schematic_info_message = (
-        f"**Название:** {name}\n"
-        f"**Описание:** {desc}\n"
+        f"**Название:** {data.get('name')}\n"
+        f"**Описание:** {data.get('description')}\n"
     )
 
     # Send the generated image and schematic info back to the specified channel

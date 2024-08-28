@@ -10,8 +10,11 @@ fs.readFile('scheme.msch', (err, base64) => {
     try {
         const schematic = Schematic.decode(buffer);
 
-        console.log(schematic.name, " ",schematic.description )
-
+        const data = {
+            name: schematic.name,
+            description: schematic.description
+        };
+        console.log(JSON.stringify(data));
         schematic
             .render({
                 background: true // enable background
