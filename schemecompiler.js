@@ -15,7 +15,6 @@ fs.readFile('scheme.msch', (err, base64) => {
             name: schematic.name,
             description: schematic.description,
         };
-        fs.writeFileSync('/home/nonamecoding/Desktop/bots/json/scheme_info.json', JSON.stringify(schematicInfo, null, 2));
 
         schematic
             .render({
